@@ -31,12 +31,12 @@ impl Cell {
     }
 
     fn discover_neighbors(&mut self) {
-        
+
     }
 }
 
 struct Map {
-    alives: Vec<Coords>,
+    cells: Vec<Rc<Cell>>,
     size: Coords,
     counter: usize
 }
@@ -44,10 +44,25 @@ struct Map {
 impl Map {
     fn new(size: Coords) -> Map {
         Map {
-            alives: Vec::new(),
+            cells: Map::populate(&size),
             size,
             counter: 0
         }
+    }
+
+    fn populate(size: &Coords) -> Vec<Rc<Cell>> {
+
+        let x_max = size.x;
+        let y_max = size.y;
+        let mut vec = Vec::new();
+
+        for x in 0..x_max {
+            for y in 0..y_max {
+                vec.push(Rc::new(Cell::new(State::Dead, Coords { x, y })));
+            }
+        }
+
+        vec
     }
 
     fn next_tick(&mut self) {
@@ -56,6 +71,12 @@ impl Map {
 
     fn map(&self) {
 
+    }
+
+    fn get_cell(&self, coord: &Coords) -> Rc<Cell> {
+        let pos = (2 * coord.x) + coord.y;
+
+        Rc::clone(&self.cells[pos])
     }
 }
 

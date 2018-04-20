@@ -104,6 +104,7 @@ impl Cell {
     }
 }
 
+#[derive(Debug)]
 struct Map {
     cells: Vec<Rc<Cell>>,
     size: Coords,
@@ -150,6 +151,6 @@ impl Map {
 }
 
 fn main() {
-    let map = Map::new(Coords {x: 100, y: 100});
-    println!("{:?}", map.get_cell(&Coords { x: 39, y: 19 }));
+    let mut map = Map::new(Coords {x: 3, y: 3});
+    println!("{:?}", map);
 }

@@ -134,7 +134,7 @@ impl Map {
     }
 
     fn get_cell(&self, coord: &Coords) -> Rc<Cell> {
-        let pos = (2 * coord.x) + coord.y;
+        let pos = coord.y + (coord.x * &self.size.y);
 
         Rc::clone(&self.cells[pos])
     }
@@ -142,6 +142,6 @@ impl Map {
 }
 
 fn main() {
-    let map = Map::new(Coords {x: 3, y: 3});
-    println!("{:?}", map.cells);
+    let map = Map::new(Coords {x: 100, y: 100});
+    println!("{:?}", map.get_cell(&Coords { x: 39, y: 19 }));
 }

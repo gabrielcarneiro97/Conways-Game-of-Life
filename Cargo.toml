@@ -1,0 +1,6 @@
+[package]
+name = "Conways-Game-of-Life"
+version = "0.1.0"
+authors = ["Gabriel Carneiro <gabriel.carneiro97@live.com>"]
+
+[dependencies]

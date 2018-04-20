@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 #[derive(Debug)]
+#[derive(PartialEq)]
 enum State {
     Alive,
     Dead
@@ -93,6 +94,13 @@ impl Cell {
         }
 
         neighboors
+    }
+
+    fn change_state(&mut self) {
+        match self.state {
+            State::Alive => self.state = State::Dead,
+            State::Dead => self.state = State::Alive
+        };
     }
 }
 

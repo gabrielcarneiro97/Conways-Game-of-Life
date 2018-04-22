@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cell::RefCell;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -106,7 +107,7 @@ impl Cell {
 
 #[derive(Debug)]
 struct Map {
-    cells: Vec<Rc<Cell>>,
+    cells: Vec<Rc<RefCell<Cell>>>,
     size: Coords,
     counter: usize
 }
@@ -120,14 +121,14 @@ impl Map {
         }
     }
 
-    fn populate(size: &Coords) -> Vec<Rc<Cell>> {
+    fn populate(size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
 
         let mut vec = Vec::new();
 
         for x in 0..size.x {
             for y in 0..size.y {
                 let cell = Cell::new(State::Dead, Coords { x, y }, Cell::find_neighboors(Coords { x, y }, &size));
-                vec.push(Rc::new(cell));
+                vec.push(Rc::new(RefCell::new(cell)));
             }
         }
 
@@ -142,7 +143,7 @@ impl Map {
 
     }
 
-    fn get_cell(&self, coord: &Coords) -> Rc<Cell> {
+    fn get_cell(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
         let pos = coord.y + (coord.x * &self.size.y);
 
         Rc::clone(&self.cells[pos])

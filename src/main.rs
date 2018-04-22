@@ -189,8 +189,8 @@ impl Map {
                 let state = &cell.borrow().state;
 
                 match *state {
-                    State::Alive => print!("A"),
-                    State::Dead => print!("D")
+                    State::Alive => print!("▀"),
+                    State::Dead => print!("╳")
                 }
             }
             println!("");
@@ -204,18 +204,24 @@ impl Map {
     }
 
     fn set_moc(&self) {
-        let cell = self.get_cell(&Coords {x: 0, y: 1});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 1, y: 1});
+        let cell = self.get_cell(&Coords {x: 1, y: 3});
         cell.borrow_mut().change_state();
         let cell = self.get_cell(&Coords {x: 2, y: 1});
+        cell.borrow_mut().change_state();
+        let cell = self.get_cell(&Coords {x: 2, y: 4});
+        cell.borrow_mut().change_state();
+        let cell = self.get_cell(&Coords {x: 3, y: 1});
+        cell.borrow_mut().change_state();
+        let cell = self.get_cell(&Coords {x: 3, y: 4});
+        cell.borrow_mut().change_state();
+        let cell = self.get_cell(&Coords {x: 4, y: 2});
         cell.borrow_mut().change_state();
     }
 
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 3, y: 3});
+    let mut map = Map::new(Coords {x: 6, y: 6});
     map.set_moc();
 
     loop {

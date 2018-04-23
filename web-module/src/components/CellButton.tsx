@@ -16,6 +16,11 @@ export class CellButton extends React.Component<any, any> {
   render () {
     const btnClass = this.state.isAlive ? 'cell-btn alive' : 'cell-btn dead';
 
-    return <button className={btnClass} onClick={this.click} />
+    const style = {
+      width: `${this.props.side}vh`,
+      height: `${this.props.side}vh`
+    }
+
+    return <button className={btnClass} onClick={this.click} style={style} />
   }
 }

@@ -3,7 +3,7 @@ import * as React from 'react';
 export class SideForm extends React.Component<any, any> {
   constructor (props: any) {
     super(props);
-    this.state = { value: '' };
+    this.state = { value: 20 };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);

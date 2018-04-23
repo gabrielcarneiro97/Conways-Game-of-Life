@@ -6,7 +6,7 @@ import { SideForm } from './components/SideForm';
 
 class App extends React.Component<any, any> {
 
-  state = { mapSide: 10 }
+  state = { mapSide: 20 }
 
   newSide = (val: any) => {
     console.log(val);

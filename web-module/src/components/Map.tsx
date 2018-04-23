@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CellButton } from './CellButton';
+import { Stage, Layer } from 'react-konva';
 
 export class Map extends React.Component<any, any> {
 
@@ -30,25 +31,23 @@ export class Map extends React.Component<any, any> {
     
     const matrix = [];
 
-    const btnSide = 95 / this.props.side;
+    const cellSide = ((window.innerHeight - 30) / this.props.side);
 
-    for (let i = 0; i < this.props.side; i++) {
-      const line = [];
-      for (let i2 = 0; i2 < this.props.side; i2++) {
-        const key = `${i}-${i2}`;
-        line.push(<CellButton key={key} onClick={this.clickCell} side={btnSide} />);
+    console.log(cellSide);
+
+    for (let x = 0; x < this.props.side; x++) {
+      for (let y = 0; y < this.props.side; y++) {
+        const key = `${x}-${y}`;
+        matrix.push(<CellButton key={key} onClick={this.clickCell} side={cellSide} x={x * cellSide} y={y * cellSide} />);
       }
-      matrix.push(
-        <div className="line" key={`line-${i}`} style={{height: `${btnSide}vh`}}>
-          {line}
-        </div>
-      );
     }
 
     return (
-      <div>
-        {matrix}        
-      </div>
+      <Stage width={window.innerHeight - 30} height={window.innerHeight - 30}>
+        <Layer>
+          {matrix}
+        </Layer>
+      </Stage>
     );
   }
 }

@@ -1,5 +1,9 @@
 import * as React from 'react';
 
-export class CellButton extends React.Component {
+import './CellButton.css';
 
+export class CellButton extends React.Component {
+  render () {
+    return <button className="cell-btn alive" />
+  }
 }

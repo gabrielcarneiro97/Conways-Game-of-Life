@@ -218,11 +218,27 @@ impl Map {
         cell.borrow_mut().change_state();
     }
 
+    fn set(&self, coords: Vec<Coords>) {
+        for coord in coords {
+            let cell = self.get_cell(&coord);
+            cell.borrow_mut().state = State::Alive;
+        }
+    }
+
 }
 
 fn main() {
     let mut map = Map::new(Coords {x: 6, y: 6});
-    map.set_moc();
+    let mut vec : Vec<Coords> = Vec::new();
+
+    vec.push(Coords {x: 1, y: 3});
+    vec.push(Coords {x: 2, y: 1});
+    vec.push(Coords {x: 2, y: 4});
+    vec.push(Coords {x: 3, y: 1});
+    vec.push(Coords {x: 3, y: 4});
+    vec.push(Coords {x: 4, y: 2});
+
+    map.set(vec);
 
     loop {
         thread::sleep(Duration::from_millis(1000));

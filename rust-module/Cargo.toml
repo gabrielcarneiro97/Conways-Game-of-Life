@@ -1,5 +1,5 @@
 [package]
-name = "Conways-Game-of-Life"
+name = "conways_game_of_life"
 version = "0.1.0"
 authors = ["Gabriel Carneiro <gabriel.carneiro97@live.com>"]
 

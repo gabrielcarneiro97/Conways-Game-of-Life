@@ -1,3 +1,9 @@
+#![feature(proc_macro, wasm_custom_section, wasm_import_module)]
+
+extern crate wasm_bindgen;
+
+use wasm_bindgen::prelude::*;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::time::Duration;
@@ -5,27 +11,31 @@ use std::thread;
 
 
 #[derive(PartialEq, Debug, Clone)]
-enum State {
+#[wasm_bindgen]
+pub enum State {
     Alive,
     Dead
 }
 
 #[derive(Debug, Clone)]
-struct Coords {
+#[wasm_bindgen]
+pub struct Coords {
     x: usize,
     y: usize
 }
 
 #[derive(Debug)]
-struct Cell {
+#[wasm_bindgen]
+pub struct Cell {
     state: State,
     position: Coords,
     neighboors: Vec<Coords>,
     neighboors_alive: i32
 }
 
+#[wasm_bindgen]
 impl Cell {
-    fn new(state: State, position: Coords, neighboors: Vec<Coords>) -> Cell {
+    pub fn new(state: State, position: Coords, neighboors: Vec<Coords>) -> Cell {
         Cell {
             state,
             position,
@@ -34,7 +44,7 @@ impl Cell {
         }
     }
 
-    fn find_neighboors(coord: Coords, size: &Coords) -> Vec<Coords> {
+    pub fn find_neighboors(coord: Coords, size: &Coords) -> Vec<Coords> {
         let x = coord.x;
         let y = coord.y;
 
@@ -100,7 +110,7 @@ impl Cell {
         neighboors
     }
 
-    fn change_state(&mut self) {
+    pub fn change_state(&mut self) {
         match self.state {
             State::Alive => self.state = State::Dead,
             State::Dead => self.state = State::Alive
@@ -109,14 +119,16 @@ impl Cell {
 }
 
 #[derive(Debug)]
-struct Map {
+#[wasm_bindgen]
+pub struct Map {
     cells: Vec<Rc<RefCell<Cell>>>,
     size: Coords,
     counter: usize
 }
 
+#[wasm_bindgen]
 impl Map {
-    fn new(size: Coords) -> Map {
+    pub fn new(size: Coords) -> Map {
         Map {
             cells: Map::populate(&size),
             size,
@@ -124,7 +136,7 @@ impl Map {
         }
     }
 
-    fn populate(size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
+    pub fn populate(size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
 
         let mut vec : Vec<Rc<RefCell<Cell>>> = Vec::new();
 
@@ -138,7 +150,7 @@ impl Map {
         vec
     }
 
-    fn next_tick(&mut self) {
+    pub fn next_tick(&mut self) {
         self.counter += 1;
 
         for cell in &self.cells {
@@ -179,7 +191,7 @@ impl Map {
 
     }
 
-    fn map(&self) {
+    pub fn map(&self) {
         let x_max = self.size.x;
         let y_max = self.size.y;
 
@@ -197,13 +209,13 @@ impl Map {
         }
     }
 
-    fn get_cell(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
+    pub fn get_cell(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
         let pos = coord.y + (coord.x * &self.size.y);
 
         Rc::clone(&self.cells[pos])
     }
 
-    fn set_moc(&self) {
+    pub fn set_moc(&self) {
         let cell = self.get_cell(&Coords {x: 1, y: 3});
         cell.borrow_mut().change_state();
         let cell = self.get_cell(&Coords {x: 2, y: 1});
@@ -218,7 +230,7 @@ impl Map {
         cell.borrow_mut().change_state();
     }
 
-    fn set(&self, coords: Vec<Coords>) {
+    pub fn set(&self, coords: Vec<Coords>) {
         for coord in coords {
             let cell = self.get_cell(&coord);
             cell.borrow_mut().state = State::Alive;
@@ -227,23 +239,23 @@ impl Map {
 
 }
 
-fn main() {
-    let mut map = Map::new(Coords {x: 6, y: 6});
-    let mut vec : Vec<Coords> = Vec::new();
+// fn main() {
+//     let mut map = Map::new(Coords {x: 6, y: 6});
+//     let mut vec : Vec<Coords> = Vec::new();
 
-    vec.push(Coords {x: 1, y: 3});
-    vec.push(Coords {x: 2, y: 1});
-    vec.push(Coords {x: 2, y: 4});
-    vec.push(Coords {x: 3, y: 1});
-    vec.push(Coords {x: 3, y: 4});
-    vec.push(Coords {x: 4, y: 2});
+//     vec.push(Coords {x: 1, y: 3});
+//     vec.push(Coords {x: 2, y: 1});
+//     vec.push(Coords {x: 2, y: 4});
+//     vec.push(Coords {x: 3, y: 1});
+//     vec.push(Coords {x: 3, y: 4});
+//     vec.push(Coords {x: 4, y: 2});
 
-    map.set(vec);
+//     map.set(vec);
 
-    loop {
-        thread::sleep(Duration::from_millis(1000));
-        print!("{}[2J", 27 as char);
-        map.map();
-        map.next_tick();
-    }
-}
+//     loop {
+//         thread::sleep(Duration::from_millis(1000));
+//         print!("{}[2J", 27 as char);
+//         map.map();
+//         map.next_tick();
+//     }
+// }

@@ -4,12 +4,6 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
-use std::rc::Rc;
-use std::cell::RefCell;
-use std::time::Duration;
-use std::thread;
-
-
 #[derive(PartialEq, Debug, Clone)]
 #[wasm_bindgen]
 pub enum State {
@@ -44,7 +38,7 @@ impl Cell {
         }
     }
 
-    pub fn find_neighboors(coord: Coords, size: &Coords) -> Vec<Coords> {
+    pub fn find_neighboors(coord: Coords, true_size: &Coords) -> Vec<Coords> {
         let x = coord.x;
         let y = coord.y;
 
@@ -55,7 +49,7 @@ impl Cell {
                 neighboors.push(Coords { x: x, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x - 1, y: y});
                 neighboors.push(Coords { x: x - 1, y: y + 1});
                 neighboors.push(Coords { x: x, y: y + 1});
@@ -66,12 +60,12 @@ impl Cell {
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y});
             }
-        } else if y == size.y - 1 {
+        } else if y == true_size.y - 1 {
             if x == 0 {
                 neighboors.push(Coords { x: x, y: y - 1});
                 neighboors.push(Coords { x: x + 1, y: y - 1});
                 neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x - 1, y: y});
                 neighboors.push(Coords { x: x - 1, y: y - 1});
                 neighboors.push(Coords { x: x, y: y - 1});
@@ -89,7 +83,7 @@ impl Cell {
                 neighboors.push(Coords { x: x + 1, y: y});
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x, y: y + 1});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x, y: y - 1});
                 neighboors.push(Coords { x: x - 1, y: y - 1});
                 neighboors.push(Coords { x: x - 1, y: y});
@@ -121,141 +115,180 @@ impl Cell {
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Map {
-    cells: Vec<Rc<RefCell<Cell>>>,
-    size: Coords,
-    counter: usize
+    alives: Vec<Coords>,
+    visible_size: Coords,
+    true_size: Coords,
+    offset: Coords,
+    generation: usize
 }
 
 #[wasm_bindgen]
 impl Map {
-    pub fn new(size: Coords) -> Map {
+    pub fn new(visible_size: Coords) -> Map {
+        let true_size = Coords {x: visible_size.x * 4, y: visible_size.y * 4};
         Map {
-            cells: Map::populate(&size),
-            size,
-            counter: 0
+            alives: Vec::new(),
+            offset: Coords { x: true_size.x/2, y: true_size.y/2 },
+            true_size,
+            visible_size,
+            generation: 0
         }
     }
 
-    pub fn populate(size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
-
-        let mut vec : Vec<Rc<RefCell<Cell>>> = Vec::new();
-
-        for x in 0..size.x {
-            for y in 0..size.y {
-                let cell = Cell::new(State::Dead, Coords { x, y }, Cell::find_neighboors(Coords { x, y }, &size));
-                vec.push(Rc::new(RefCell::new(cell)));
-            }
-        }
-
-        vec
-    }
 
     pub fn next_tick(&mut self) {
-        self.counter += 1;
+        self.generation += 1;
 
-        for cell in &self.cells {
-            let mut borrow = cell.borrow_mut();
-            let mut alives = 0;
+        let mut next_gen : Vec<Coords> = Vec::new();
 
-            for neighboor in &borrow.neighboors {
-                let neighboor_cell = self.get_cell(&neighboor);
-                let state = &neighboor_cell.borrow().state;
+        for cell_coord in &self.alives {
+            let mut cell = Cell::new(State::Alive, 
+                Coords { x: cell_coord.x, y: cell_coord.y }, 
+                Cell::find_neighboors(Coords { x: cell_coord.x, y: cell_coord.y }, 
+                &self.true_size));
 
-                match *state {
-                    State::Alive => alives += 1,
-                    State::Dead => ()
-                }
-            }
-            borrow.neighboors_alive = alives;            
-        }
+            for neighboor in cell.neighboors {
+                if self.is_alive(&neighboor) {
+                    cell.neighboors_alive += 1;
+                } else {
+                    let mut neighboor_cell = Cell::new(State::Dead, 
+                        Coords { x: neighboor.x, y: neighboor.y }, 
+                        Cell::find_neighboors(Coords { x: neighboor.x, y: neighboor.y }, 
+                        &self.true_size));
 
-        for cell in &self.cells {
-            let mut borrow = cell.borrow_mut();
-            let alives = borrow.neighboors_alive;
+                    let alives = self.count_neighboors_alive(&mut neighboor_cell);
 
-            let state = borrow.state.clone();
-
-            match state {
-                State::Alive => {
-                    if alives < 2 || alives > 3 {
-                        borrow.change_state();
-                    }
-                },
-                State::Dead => {
                     if alives == 3 {
-                        borrow.change_state();
+                        let already;
+                        match &next_gen.iter().position(|next_gen_cell| next_gen_cell.x == neighboor.x && next_gen_cell.y == neighboor.y) {
+                            Some(_) => already = true,
+                            None => already = false
+                        };
+                        if !already {
+                            next_gen.push(Coords {x: neighboor.x, y: neighboor.y});                            
+                        }
                     }
                 }
             }
+
+            if cell.neighboors_alive == 2 || cell.neighboors_alive == 3 {
+                next_gen.push(Coords {x: cell_coord.x, y: cell_coord.y});
+            }
+
         }
 
+        self.alives = next_gen;
+
+    }
+
+    pub fn count_neighboors_alive(&self, cell: &mut Cell) -> i32 {
+        for neighboor in &cell.neighboors {
+            if self.is_alive(&neighboor) {
+                cell.neighboors_alive += 1;
+            }
+        }
+        cell.neighboors_alive
     }
 
     pub fn map(&self) {
-        let x_max = self.size.x;
-        let y_max = self.size.y;
+        let x_offset = self.offset.x;
+        let y_offset = self.offset.y;
+        let x_max = self.visible_size.x + x_offset;
+        let y_max = self.visible_size.y + y_offset;
 
-        for x in 0..x_max {
-            for y in 0..y_max {
-                let cell = self.get_cell(&Coords {x: x, y: y});
-                let state = &cell.borrow().state;
-
-                match *state {
-                    State::Alive => print!("▀"),
-                    State::Dead => print!("╳")
+        for x in x_offset..x_max {
+            for y in y_offset..y_max {
+                if self.is_alive(&Coords {x, y}) {
+                    print!("0");
+                } else {
+                    print!(".");
                 }
             }
             println!("");
         }
     }
 
-    pub fn get_cell(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
-        let pos = coord.y + (coord.x * &self.size.y);
-
-        Rc::clone(&self.cells[pos])
+    pub fn is_alive(&self, coord: &Coords) -> bool {
+        let ret;
+        match &self.alives.iter().position(|cell| cell.x == coord.x && cell.y == coord.y) {
+            Some(_) => {ret = true;},
+            None => {ret = false;}
+        };
+        ret
     }
 
-    pub fn set_moc(&self) {
-        let cell = self.get_cell(&Coords {x: 1, y: 3});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 2, y: 1});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 2, y: 4});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 3, y: 1});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 3, y: 4});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 4, y: 2});
-        cell.borrow_mut().change_state();
-    }
-
-    pub fn set(&self, coords: Vec<Coords>) {
+    pub fn set_alive(&mut self, coords: Vec<Coords>) {
         for coord in coords {
-            let cell = self.get_cell(&coord);
-            cell.borrow_mut().state = State::Alive;
+            if !self.is_alive(&coord) {
+                self.alives.push(Coords { x: coord.x + self.offset.x, y: coord.y + self.offset.y});
+            }
         }
     }
 
+    pub fn blinker() -> Vec<Coords> {
+        let mut blinker : Vec<Coords> = Vec::new();
+
+        blinker.push(Coords {x: 1, y: 2});
+        blinker.push(Coords {x: 2, y: 2});
+        blinker.push(Coords {x: 3, y: 2});
+        
+        blinker
+    }
+
+    pub fn glider() -> Vec<Coords> {
+        let mut glider : Vec<Coords> = Vec::new();
+
+        glider.push(Coords {x: 0, y: 0});
+        glider.push(Coords {x: 0, y: 2});
+        glider.push(Coords {x: 1, y: 1});
+        glider.push(Coords {x: 1, y: 2});
+        glider.push(Coords {x: 2, y: 1});
+
+        glider
+    }
+
+    pub fn gosper_glider_gun() -> Vec<Coords> {
+        let mut gosper_glider_gun : Vec<Coords> = Vec::new();
+
+        gosper_glider_gun.push(Coords {x: 5, y: 1});
+        gosper_glider_gun.push(Coords {x: 6, y: 1});
+        gosper_glider_gun.push(Coords {x: 5, y: 2});
+        gosper_glider_gun.push(Coords {x: 6, y: 2});
+        gosper_glider_gun.push(Coords {x: 5, y: 11});
+        gosper_glider_gun.push(Coords {x: 6, y: 11});
+        gosper_glider_gun.push(Coords {x: 7, y: 11});
+        gosper_glider_gun.push(Coords {x: 8, y: 12});
+        gosper_glider_gun.push(Coords {x: 4, y: 12});
+        gosper_glider_gun.push(Coords {x: 9, y: 13});
+        gosper_glider_gun.push(Coords {x: 3, y: 13});        
+        gosper_glider_gun.push(Coords {x: 9, y: 14});
+        gosper_glider_gun.push(Coords {x: 3, y: 14});
+        gosper_glider_gun.push(Coords {x: 6, y: 15});
+        gosper_glider_gun.push(Coords {x: 4, y: 16});
+        gosper_glider_gun.push(Coords {x: 8, y: 16});
+        gosper_glider_gun.push(Coords {x: 5, y: 17});
+        gosper_glider_gun.push(Coords {x: 6, y: 17});
+        gosper_glider_gun.push(Coords {x: 7, y: 17});
+        gosper_glider_gun.push(Coords {x: 6, y: 18});
+        gosper_glider_gun.push(Coords {x: 3, y: 21});
+        gosper_glider_gun.push(Coords {x: 4, y: 21});
+        gosper_glider_gun.push(Coords {x: 5, y: 21});
+        gosper_glider_gun.push(Coords {x: 3, y: 22});
+        gosper_glider_gun.push(Coords {x: 4, y: 22});
+        gosper_glider_gun.push(Coords {x: 5, y: 22});
+        gosper_glider_gun.push(Coords {x: 2, y: 23});
+        gosper_glider_gun.push(Coords {x: 6, y: 23});
+        gosper_glider_gun.push(Coords {x: 1, y: 25});
+        gosper_glider_gun.push(Coords {x: 2, y: 25});
+        gosper_glider_gun.push(Coords {x: 6, y: 25});
+        gosper_glider_gun.push(Coords {x: 7, y: 25});
+        gosper_glider_gun.push(Coords {x: 3, y: 35});
+        gosper_glider_gun.push(Coords {x: 4, y: 35});
+        gosper_glider_gun.push(Coords {x: 3, y: 36});
+        gosper_glider_gun.push(Coords {x: 4, y: 36});
+        
+
+        gosper_glider_gun
+    }
+
 }
-
-// fn main() {
-//     let mut map = Map::new(Coords {x: 6, y: 6});
-//     let mut vec : Vec<Coords> = Vec::new();
-
-//     vec.push(Coords {x: 1, y: 3});
-//     vec.push(Coords {x: 2, y: 1});
-//     vec.push(Coords {x: 2, y: 4});
-//     vec.push(Coords {x: 3, y: 1});
-//     vec.push(Coords {x: 3, y: 4});
-//     vec.push(Coords {x: 4, y: 2});
-
-//     map.set(vec);
-
-//     loop {
-//         thread::sleep(Duration::from_millis(1000));
-//         print!("{}[2J", 27 as char);
-//         map.map();
-//         map.next_tick();
-//     }
-// }

@@ -112,7 +112,7 @@ impl Cell {
 pub struct Map {
     cells: Vec<Rc<RefCell<Cell>>>,
     size: Coords,
-    counter: usize
+    generation: usize
 }
 
 impl Map {
@@ -120,7 +120,7 @@ impl Map {
         Map {
             cells: Map::populate(&size),
             size,
-            counter: 0
+            generation: 0
         }
     }
 
@@ -139,7 +139,7 @@ impl Map {
     }
 
     pub fn next_tick(&mut self) {
-        self.counter += 1;
+        self.generation += 1;
 
         for cell in &self.cells {
             let mut borrow = cell.borrow_mut();

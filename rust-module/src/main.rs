@@ -203,21 +203,6 @@ impl Map {
         Rc::clone(&self.cells[pos])
     }
 
-    pub fn set_moc(&self) {
-        let cell = self.get_cell(&Coords {x: 1, y: 3});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 2, y: 1});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 2, y: 4});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 3, y: 1});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 3, y: 4});
-        cell.borrow_mut().change_state();
-        let cell = self.get_cell(&Coords {x: 4, y: 2});
-        cell.borrow_mut().change_state();
-    }
-
     pub fn set(&self, coords: Vec<Coords>) {
         for coord in coords {
             let cell = self.get_cell(&coord);
@@ -225,23 +210,81 @@ impl Map {
         }
     }
 
+    pub fn blinker() -> Vec<Coords> {
+        let mut blinker : Vec<Coords> = Vec::new();
+
+        blinker.push(Coords {x: 1, y: 2});
+        blinker.push(Coords {x: 2, y: 2});
+        blinker.push(Coords {x: 3, y: 2});
+        
+        blinker
+    }
+
+    pub fn glider() -> Vec<Coords> {
+        let mut glider : Vec<Coords> = Vec::new();
+
+        glider.push(Coords {x: 0, y: 0});
+        glider.push(Coords {x: 0, y: 2});
+        glider.push(Coords {x: 1, y: 1});
+        glider.push(Coords {x: 1, y: 2});
+        glider.push(Coords {x: 2, y: 1});
+
+        glider
+    }
+
+    pub fn gosper_glider_gun() -> Vec<Coords> {
+        let mut gosper_glider_gun : Vec<Coords> = Vec::new();
+
+        gosper_glider_gun.push(Coords {x: 5, y: 1});
+        gosper_glider_gun.push(Coords {x: 6, y: 1});
+        gosper_glider_gun.push(Coords {x: 5, y: 2});
+        gosper_glider_gun.push(Coords {x: 6, y: 2});
+        gosper_glider_gun.push(Coords {x: 5, y: 11});
+        gosper_glider_gun.push(Coords {x: 6, y: 11});
+        gosper_glider_gun.push(Coords {x: 7, y: 11});
+        gosper_glider_gun.push(Coords {x: 8, y: 12});
+        gosper_glider_gun.push(Coords {x: 4, y: 12});
+        gosper_glider_gun.push(Coords {x: 9, y: 13});
+        gosper_glider_gun.push(Coords {x: 3, y: 13});        
+        gosper_glider_gun.push(Coords {x: 9, y: 14});
+        gosper_glider_gun.push(Coords {x: 3, y: 14});
+        gosper_glider_gun.push(Coords {x: 6, y: 15});
+        gosper_glider_gun.push(Coords {x: 4, y: 16});
+        gosper_glider_gun.push(Coords {x: 8, y: 16});
+        gosper_glider_gun.push(Coords {x: 5, y: 17});
+        gosper_glider_gun.push(Coords {x: 6, y: 17});
+        gosper_glider_gun.push(Coords {x: 7, y: 17});
+        gosper_glider_gun.push(Coords {x: 6, y: 18});
+        gosper_glider_gun.push(Coords {x: 3, y: 21});
+        gosper_glider_gun.push(Coords {x: 4, y: 21});
+        gosper_glider_gun.push(Coords {x: 5, y: 21});
+        gosper_glider_gun.push(Coords {x: 3, y: 22});
+        gosper_glider_gun.push(Coords {x: 4, y: 22});
+        gosper_glider_gun.push(Coords {x: 5, y: 22});
+        gosper_glider_gun.push(Coords {x: 2, y: 23});
+        gosper_glider_gun.push(Coords {x: 6, y: 23});
+        gosper_glider_gun.push(Coords {x: 1, y: 25});
+        gosper_glider_gun.push(Coords {x: 2, y: 25});
+        gosper_glider_gun.push(Coords {x: 6, y: 25});
+        gosper_glider_gun.push(Coords {x: 7, y: 25});
+        gosper_glider_gun.push(Coords {x: 3, y: 35});
+        gosper_glider_gun.push(Coords {x: 4, y: 35});
+        gosper_glider_gun.push(Coords {x: 3, y: 36});
+        gosper_glider_gun.push(Coords {x: 4, y: 36});
+        
+
+        gosper_glider_gun
+    }
+
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 6, y: 6});
-    let mut vec : Vec<Coords> = Vec::new();
-
-    vec.push(Coords {x: 1, y: 3});
-    vec.push(Coords {x: 2, y: 1});
-    vec.push(Coords {x: 2, y: 4});
-    vec.push(Coords {x: 3, y: 1});
-    vec.push(Coords {x: 3, y: 4});
-    vec.push(Coords {x: 4, y: 2});
-
-    map.set(vec);
+    let mut map = Map::new(Coords {x: 45, y: 150});
+    
+    map.set(Map::blinker());
 
     loop {
-        thread::sleep(Duration::from_millis(1000));
+        thread::sleep(Duration::from_millis(300));
         print!("{}[2J", 27 as char);
         map.map();
         map.next_tick();

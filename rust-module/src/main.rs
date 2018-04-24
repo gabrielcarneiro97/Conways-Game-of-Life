@@ -34,7 +34,7 @@ impl Cell {
         }
     }
 
-    pub fn find_neighboors(coord: Coords, size: &Coords) -> Vec<Coords> {
+    pub fn find_neighboors(coord: Coords, true_size: &Coords) -> Vec<Coords> {
         let x = coord.x;
         let y = coord.y;
 
@@ -45,7 +45,7 @@ impl Cell {
                 neighboors.push(Coords { x: x, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x - 1, y: y});
                 neighboors.push(Coords { x: x - 1, y: y + 1});
                 neighboors.push(Coords { x: x, y: y + 1});
@@ -56,12 +56,12 @@ impl Cell {
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x + 1, y: y});
             }
-        } else if y == size.y - 1 {
+        } else if y == true_size.y - 1 {
             if x == 0 {
                 neighboors.push(Coords { x: x, y: y - 1});
                 neighboors.push(Coords { x: x + 1, y: y - 1});
                 neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x - 1, y: y});
                 neighboors.push(Coords { x: x - 1, y: y - 1});
                 neighboors.push(Coords { x: x, y: y - 1});
@@ -79,7 +79,7 @@ impl Cell {
                 neighboors.push(Coords { x: x + 1, y: y});
                 neighboors.push(Coords { x: x + 1, y: y + 1});
                 neighboors.push(Coords { x: x, y: y + 1});
-            } else if x == size.x - 1 {
+            } else if x == true_size.x - 1 {
                 neighboors.push(Coords { x: x, y: y - 1});
                 neighboors.push(Coords { x: x - 1, y: y - 1});
                 neighboors.push(Coords { x: x - 1, y: y});
@@ -111,26 +111,31 @@ impl Cell {
 #[derive(Debug)]
 pub struct Map {
     cells: Vec<Rc<RefCell<Cell>>>,
-    size: Coords,
+    visible_size: Coords,
+    true_size: Coords,
+    offset: Coords,
     generation: usize
 }
 
 impl Map {
-    pub fn new(size: Coords) -> Map {
+    pub fn new(visible_size: Coords) -> Map {
+        let true_size = Coords {x: visible_size.x * 10, y: visible_size.y * 10};
         Map {
-            cells: Map::populate(&size),
-            size,
+            cells: Map::populate(&true_size),
+            offset: Coords { x: true_size.x/2, y: true_size.y/2 },
+            true_size,
+            visible_size,
             generation: 0
         }
     }
 
-    pub fn populate(size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
+    pub fn populate(true_size: &Coords) -> Vec<Rc<RefCell<Cell>>> {
 
         let mut vec : Vec<Rc<RefCell<Cell>>> = Vec::new();
 
-        for x in 0..size.x {
-            for y in 0..size.y {
-                let cell = Cell::new(State::Dead, Coords { x, y }, Cell::find_neighboors(Coords { x, y }, &size));
+        for x in 0..true_size.x {
+            for y in 0..true_size.y {
+                let cell = Cell::new(State::Dead, Coords { x, y }, Cell::find_neighboors(Coords { x, y }, &true_size));
                 vec.push(Rc::new(RefCell::new(cell)));
             }
         }
@@ -146,7 +151,7 @@ impl Map {
             let mut alives = 0;
 
             for neighboor in &borrow.neighboors {
-                let neighboor_cell = self.get_cell(&neighboor);
+                let neighboor_cell = self.get_cell_no_offset(&neighboor);
                 let state = &neighboor_cell.borrow().state;
 
                 match *state {
@@ -180,17 +185,17 @@ impl Map {
     }
 
     pub fn map(&self) {
-        let x_max = self.size.x;
-        let y_max = self.size.y;
+        let x_max = self.visible_size.x;
+        let y_max = self.visible_size.y;
 
         for x in 0..x_max {
             for y in 0..y_max {
-                let cell = self.get_cell(&Coords {x: x, y: y});
+                let cell = self.get_cell(&Coords {x, y});
                 let state = &cell.borrow().state;
 
                 match *state {
-                    State::Alive => print!("▀"),
-                    State::Dead => print!("╳")
+                    State::Alive => print!("0"),
+                    State::Dead => print!(".")
                 }
             }
             println!("");
@@ -198,7 +203,13 @@ impl Map {
     }
 
     pub fn get_cell(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
-        let pos = coord.y + (coord.x * &self.size.y);
+        let pos = (coord.y + &self.offset.y) + ((coord.x + &self.offset.x) * (&self.true_size.y));
+
+        Rc::clone(&self.cells[pos])
+    }
+
+    pub fn get_cell_no_offset(&self, coord: &Coords) -> Rc<RefCell<Cell>> {
+        let pos = coord.y + (coord.x * &self.true_size.y);
 
         Rc::clone(&self.cells[pos])
     }
@@ -279,13 +290,14 @@ impl Map {
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 45, y: 150});
+    let mut map = Map::new(Coords {x: 3, y: 5});
     
-    map.set(Map::blinker());
+    map.set(Map::glider());
 
     loop {
         thread::sleep(Duration::from_millis(300));
-        print!("{}[2J", 27 as char);
+        // print!("{}[2J", 27 as char);
+        println!("------generation({})------", map.generation);
         map.map();
         map.next_tick();
     }

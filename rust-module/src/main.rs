@@ -1,5 +1,3 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
 
@@ -135,26 +133,26 @@ impl Map {
 
         let mut next_gen : Vec<Coords> = Vec::new();
 
-        for cellCoord in &self.alives {
+        for cell_coord in &self.alives {
             let mut cell = Cell::new(State::Alive, 
-                Coords { x: cellCoord.x, y: cellCoord.y }, 
-                Cell::find_neighboors(Coords { x: cellCoord.x, y: cellCoord.y }, 
+                Coords { x: cell_coord.x, y: cell_coord.y }, 
+                Cell::find_neighboors(Coords { x: cell_coord.x, y: cell_coord.y }, 
                 &self.true_size));
 
             for neighboor in cell.neighboors {
                 if self.is_alive(&neighboor) {
                     cell.neighboors_alive += 1;
                 } else {
-                    let mut neighboorCell = Cell::new(State::Dead, 
+                    let mut neighboor_cell = Cell::new(State::Dead, 
                         Coords { x: neighboor.x, y: neighboor.y }, 
                         Cell::find_neighboors(Coords { x: neighboor.x, y: neighboor.y }, 
                         &self.true_size));
 
-                    let alives = self.count_neighboors_alive(&mut neighboorCell);
+                    let alives = self.count_neighboors_alive(&mut neighboor_cell);
 
                     if alives == 3 {
                         let already;
-                        match &next_gen.into_iter().position(|next_gen_cell| next_gen_cell.x == neighboor.x && next_gen_cell.y == neighboor.y) {
+                        match &next_gen.iter().position(|next_gen_cell| next_gen_cell.x == neighboor.x && next_gen_cell.y == neighboor.y) {
                             Some(_) => already = true,
                             None => already = false
                         };
@@ -166,7 +164,7 @@ impl Map {
             }
 
             if cell.neighboors_alive == 2 || cell.neighboors_alive == 3 {
-                next_gen.push(Coords {x: cellCoord.x, y: cellCoord.y});
+                next_gen.push(Coords {x: cell_coord.x, y: cell_coord.y});
             }
 
         }
@@ -185,11 +183,13 @@ impl Map {
     }
 
     pub fn map(&self) {
-        let x_max = self.visible_size.x;
-        let y_max = self.visible_size.y;
+        let x_offset = self.offset.x;
+        let y_offset = self.offset.y;
+        let x_max = self.visible_size.x + x_offset;
+        let y_max = self.visible_size.y + y_offset;
 
-        for x in 0..x_max {
-            for y in 0..y_max {
+        for x in x_offset..x_max {
+            for y in y_offset..y_max {
                 if self.is_alive(&Coords {x, y}) {
                     print!("0");
                 } else {
@@ -202,8 +202,7 @@ impl Map {
 
     pub fn is_alive(&self, coord: &Coords) -> bool {
         let ret;
-        let alives = &self.alives.clone();
-        match alives.into_iter().position(|cell| cell.x == coord.x && cell.y == coord.y) {
+        match &self.alives.iter().position(|cell| cell.x == coord.x && cell.y == coord.y) {
             Some(_) => {ret = true;},
             None => {ret = false;}
         };
@@ -213,7 +212,7 @@ impl Map {
     pub fn set_alive(&mut self, coords: Vec<Coords>) {
         for coord in coords {
             if !self.is_alive(&coord) {
-                self.alives.push(coord);
+                self.alives.push(Coords { x: coord.x + self.offset.x, y: coord.y + self.offset.y});
             }
         }
     }
@@ -287,15 +286,15 @@ impl Map {
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 80, y: 60});
+    let mut map = Map::new(Coords {x: 30, y: 50});
     
-    map.set_alive(Map::glider());
+    map.set_alive(Map::gosper_glider_gun());
 
     loop {
-        // thread::sleep(Duration::from_millis(300));
-        // print!("{}[2J", 27 as char);
+        thread::sleep(Duration::from_millis(100));
+        print!("{}[2J", 27 as char);
         println!("------generation({})------", map.generation);
-        // map.map();
+        map.map();
         map.next_tick();
     }
 }

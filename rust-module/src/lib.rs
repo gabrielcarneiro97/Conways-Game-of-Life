@@ -79,6 +79,9 @@ impl Map {
         }
     }
 
+    pub fn get_alives(&self) -> Vec<i32> {
+        self.alives.clone()
+    }
 
     pub fn next_tick(&mut self) {
         self.generation += 1;
@@ -212,22 +215,25 @@ impl Map {
         cell.neighboors_alive
     }
 
-    pub fn map(&self) {
+    pub fn get_map(&self) -> Vec<i32> {
         let x_offset = self.offset.x;
         let y_offset = self.offset.y;
         let x_max = self.visible_size.x + x_offset;
         let y_max = self.visible_size.y + y_offset;
 
+        let mut vec : Vec<i32> = Vec::new();
+
         for x in x_offset..x_max {
             for y in y_offset..y_max {
                 if self.is_alive(self.get_pos(&Coords {x, y})) {
-                    print!("0");
+                    vec.push(1);
                 } else {
-                    print!(".");
+                    vec.push(0);
                 }
             }
-            println!("");
         }
+
+        vec
     }
 
     pub fn get_pos(&self, coord: &Coords) -> i32 {
@@ -356,5 +362,10 @@ impl Map {
         gosper_glider_gun
     }
 
+}
+
+#[wasm_bindgen]
+pub fn new_map(x: i32, y: i32) -> Map {
+    Map::new(Coords {x, y})
 }
 

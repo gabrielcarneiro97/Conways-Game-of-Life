@@ -18,92 +18,26 @@ pub enum State {
 
 #[derive(Debug, Clone)]
 pub struct Coords {
-    x: usize,
-    y: usize
+    x: i64,
+    y: i64
 }
 
 #[derive(Debug)]
 pub struct Cell {
     state: State,
-    position: Coords,
-    neighboors: Vec<Coords>,
+    position: i64,
+    neighboors: Vec<i64>,
     neighboors_alive: i32
 }
 
 impl Cell {
-    pub fn new(state: State, position: Coords, neighboors: Vec<Coords>) -> Cell {
+    pub fn new(state: State, position: i64, neighboors: Vec<i64>) -> Cell {
         Cell {
             state,
             position,
             neighboors,
             neighboors_alive: 0
         }
-    }
-
-    pub fn find_neighboors(coord: Coords, true_size: &Coords) -> Vec<Coords> {
-        let x = coord.x;
-        let y = coord.y;
-
-        let mut neighboors : Vec<Coords> = Vec::new();
-
-        if y == 0 {
-            if x == 0 {
-                neighboors.push(Coords { x: x, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == true_size.x - 1 {
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y + 1});
-                neighboors.push(Coords { x: x, y: y + 1});
-            } else {
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y + 1});
-                neighboors.push(Coords { x: x, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-            }
-        } else if y == true_size.y - 1 {
-            if x == 0 {
-                neighboors.push(Coords { x: x, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-            } else if x == true_size.x - 1 {
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y - 1});
-                neighboors.push(Coords { x: x, y: y - 1});
-            } else {
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y - 1});
-                neighboors.push(Coords { x: x, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-            }
-        } else {
-            if x == 0 {
-                neighboors.push(Coords { x: x, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y - 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-                neighboors.push(Coords { x: x + 1, y: y + 1});
-                neighboors.push(Coords { x: x, y: y + 1});
-            } else if x == true_size.x - 1 {
-                neighboors.push(Coords { x: x, y: y - 1});
-                neighboors.push(Coords { x: x - 1, y: y - 1});
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y + 1});
-                neighboors.push(Coords { x: x, y: y + 1});
-            } else {
-                neighboors.push(Coords { x: x - 1, y: y - 1});
-                neighboors.push(Coords { x: x - 1, y: y});
-                neighboors.push(Coords { x: x - 1, y: y + 1});
-                neighboors.push(Coords { x: x, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y + 1});
-                neighboors.push(Coords { x: x + 1, y: y});
-                neighboors.push(Coords { x: x + 1, y: y - 1});
-                neighboors.push(Coords { x: x, y: y - 1});
-            }
-        }
-
-        neighboors
     }
 
     pub fn change_state(&mut self) {
@@ -116,12 +50,12 @@ impl Cell {
 
 #[derive(Debug)]
 pub struct Map {
-    alives: Vec<Coords>,
+    alives: Vec<i64>,
     bit_map: BitVec,
     visible_size: Coords,
     true_size: Coords,
     offset: Coords,
-    generation: usize
+    generation: i32
 }
 
 impl Map {
@@ -129,7 +63,7 @@ impl Map {
         let true_size = Coords {x: visible_size.x * 4, y: visible_size.y * 4};
         Map {
             alives: Vec::new(),
-            bit_map: BitVec::from_elem(true_size.x * true_size.y, false),
+            bit_map: BitVec::from_elem((true_size.x * true_size.y) as usize, false),
             offset: Coords { x: true_size.x/2, y: true_size.y/2 },
             true_size,
             visible_size,
@@ -141,64 +75,129 @@ impl Map {
     pub fn next_tick(&mut self) {
         self.generation += 1;
 
-        let mut next_gen : Vec<Coords> = Vec::new();
-        let mut kill : Vec<usize> = Vec::new();
+        let mut next_gen : Vec<i64> = Vec::new();
+        let mut kill : Vec<i64> = Vec::new();
 
-        for cell_coord in &self.alives {
+        for cell_bit_pos in &self.alives {
+            let cell_coord = self.get_coords(*cell_bit_pos);
             let mut cell = Cell::new(State::Alive, 
-                Coords { x: cell_coord.x, y: cell_coord.y }, 
-                Cell::find_neighboors(Coords { x: cell_coord.x, y: cell_coord.y }, 
-                &self.true_size));
+                *cell_bit_pos, 
+                self.find_neighboors(*cell_bit_pos));
 
             for neighboor in cell.neighboors {
-                if self.is_alive(&neighboor) {
+                if self.is_alive(neighboor) {
                     cell.neighboors_alive += 1;
                 } else {
                     let mut neighboor_cell = Cell::new(State::Dead, 
-                        Coords { x: neighboor.x, y: neighboor.y }, 
-                        Cell::find_neighboors(Coords { x: neighboor.x, y: neighboor.y }, 
-                        &self.true_size));
+                        neighboor, 
+                        self.find_neighboors(neighboor));
 
                     let alives = self.count_neighboors_alive(&mut neighboor_cell);
 
                     if alives == 3 {
                         let already;
-                        match &next_gen.iter().position(|next_gen_cell| next_gen_cell.x == neighboor.x && next_gen_cell.y == neighboor.y) {
+                        match &next_gen.iter().position(|next_gen_cell| next_gen_cell == &neighboor) {
                             Some(_) => already = true,
                             None => already = false
                         };
                         if !already {
-                            next_gen.push(Coords {x: neighboor.x, y: neighboor.y});                            
+                            next_gen.push(neighboor);                            
                         }
                     }
                 }
             }
 
             if cell.neighboors_alive == 2 || cell.neighboors_alive == 3 {
-                next_gen.push(Coords {x: cell_coord.x, y: cell_coord.y});
+                next_gen.push(self.get_pos(&Coords {x: cell_coord.x, y: cell_coord.y}));
             } else {
-                let pos = cell_coord.y + (cell_coord.x * self.true_size.y);
-                kill.push(pos);
+                kill.push(self.get_pos(&cell_coord));
             }
 
         }
 
-        for cell in &next_gen {
-            let pos = cell.y + (cell.x * self.true_size.y);
-            self.bit_map.set(pos, true);
+        for pos in &next_gen {
+            self.bit_map.set(*pos as usize, true);
         }
 
         for to_kill in kill {
-            self.bit_map.set(to_kill, false);
+            self.bit_map.set(to_kill as usize, false);
         }
 
         self.alives = next_gen;
 
     }
 
+        pub fn find_neighboors(&self, pos: i64) -> Vec<i64> {
+        
+        let coord = self.get_coords(pos);
+        let x = coord.x;
+        let y = coord.y;
+
+        let mut neighboors : Vec<i64> = Vec::new();
+
+        if y == 0 {
+            if x == 0 {
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+            } else if x == self.true_size.x - 1 {
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+            } else {
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+            }
+        } else if y == self.true_size.y - 1 {
+            if x == 0 {
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+            } else if x == self.true_size.x - 1 {
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+            } else {
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+            }
+        } else {
+            if x == 0 {
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+            } else if x == self.true_size.x - 1 {
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+            } else {
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+            }
+        }
+
+        neighboors
+    }
+
     pub fn count_neighboors_alive(&self, cell: &mut Cell) -> i32 {
         for neighboor in &cell.neighboors {
-            if self.is_alive(&neighboor) {
+            if self.is_alive(*neighboor) {
                 cell.neighboors_alive += 1;
             }
         }
@@ -213,7 +212,7 @@ impl Map {
 
         for x in x_offset..x_max {
             for y in y_offset..y_max {
-                if self.is_alive(&Coords {x, y}) {
+                if self.is_alive(self.get_pos(&Coords {x, y})) {
                     print!("0");
                 } else {
                     print!(".");
@@ -223,17 +222,26 @@ impl Map {
         }
     }
 
-    pub fn is_alive(&self, coord: &Coords) -> bool {
-        let pos = coord.y + (coord.x * self.true_size.y);
-        self.bit_map[pos]
+    pub fn get_pos(&self, coord: &Coords) -> i64 {
+        coord.y + (coord.x * self.true_size.y)
     }
 
-    pub fn set_alive(&mut self, coords: Vec<Coords>) {
-        for coord in coords {
-            if !self.is_alive(&coord) {
-                self.alives.push(Coords { x: coord.x + self.offset.x, y: coord.y + self.offset.y});
-                let pos = (coord.y + self.offset.y) + ((coord.x + self.offset.x) * self.true_size.y);
-                self.bit_map.set(pos, true);
+    pub fn get_coords(&self, pos: i64) -> Coords {
+        Coords {
+            x: pos / self.true_size.y,
+            y: pos % self.true_size.y
+        }
+    }
+
+    pub fn is_alive(&self, pos: i64) -> bool {
+        self.bit_map[pos as usize]
+    }
+
+    pub fn set_alive(&mut self, pos_vec: Vec<i64>) {
+        for pos in pos_vec {
+            if !self.is_alive(pos) {
+                self.alives.push(pos);
+                self.bit_map.set(pos as usize, true);
             }
         }
     }
@@ -242,92 +250,92 @@ impl Map {
 
         let max_max;
 
-        if self.visible_size.x * self.visible_size.y / 2 > 10000 {
+        if self.true_size.x * self.true_size.y / 2 > 10000 {
             max_max = 10000;
         } else {
-            max_max = self.visible_size.x * self.visible_size.y / 2;
+            max_max = self.true_size.x * self.true_size.y / 2;
         }
 
         let max_range = Range::new(0, max_max);
         let mut rng = rand::thread_rng();
-        let max = max_range.ind_sample(&mut rng) as usize;
+        let max = max_range.ind_sample(&mut rng) as i64;
 
-        let mut coords : Vec<Coords> = Vec::new();
+        let mut coords : Vec<i64> = Vec::new();
 
         for _ in 0..max {
-            let range_x = Range::new(0usize, self.visible_size.x);
-            let range_y = Range::new(0usize, self.visible_size.y);
+            let range_x = Range::new(0usize, self.true_size.x as usize);
+            let range_y = Range::new(0usize, self.true_size.y as usize);
 
-            let x = range_x.ind_sample(&mut rng);
-            let y = range_y.ind_sample(&mut rng);
+            let x = range_x.ind_sample(&mut rng) as i64;
+            let y = range_y.ind_sample(&mut rng) as i64;
 
-            coords.push(Coords {x, y});
+            coords.push(self.get_pos(&Coords {x, y}));
         }
 
         self.set_alive(coords);
     }
 
-    pub fn blinker() -> Vec<Coords> {
-        let mut blinker : Vec<Coords> = Vec::new();
+    pub fn blinker(&self) -> Vec<i64> {
+        let mut blinker : Vec<i64> = Vec::new();
 
-        blinker.push(Coords {x: 1, y: 2});
-        blinker.push(Coords {x: 2, y: 2});
-        blinker.push(Coords {x: 3, y: 2});
+        blinker.push(self.get_pos(&Coords {x: 1, y: 2}));
+        blinker.push(self.get_pos(&Coords {x: 2, y: 2}));
+        blinker.push(self.get_pos(&Coords {x: 3, y: 2}));
         
         blinker
     }
 
-    pub fn glider() -> Vec<Coords> {
-        let mut glider : Vec<Coords> = Vec::new();
+    pub fn glider(&self) -> Vec<i64> {
+        let mut glider : Vec<i64> = Vec::new();
 
-        glider.push(Coords {x: 0, y: 0});
-        glider.push(Coords {x: 0, y: 2});
-        glider.push(Coords {x: 1, y: 1});
-        glider.push(Coords {x: 1, y: 2});
-        glider.push(Coords {x: 2, y: 1});
+        glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 0 + self.offset.y}));
+        glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 2 + self.offset.y}));
+        glider.push(self.get_pos(&Coords {x: 1 + self.offset.x, y: 1 + self.offset.y}));
+        glider.push(self.get_pos(&Coords {x: 1 + self.offset.x, y: 2 + self.offset.y}));
+        glider.push(self.get_pos(&Coords {x: 2 + self.offset.x, y: 1 + self.offset.y}));
 
         glider
     }
 
-    pub fn gosper_glider_gun() -> Vec<Coords> {
-        let mut gosper_glider_gun : Vec<Coords> = Vec::new();
+    pub fn gosper_glider_gun(&self) -> Vec<i64> {
+        let mut gosper_glider_gun : Vec<i64> = Vec::new();
 
-        gosper_glider_gun.push(Coords {x: 5, y: 1});
-        gosper_glider_gun.push(Coords {x: 6, y: 1});
-        gosper_glider_gun.push(Coords {x: 5, y: 2});
-        gosper_glider_gun.push(Coords {x: 6, y: 2});
-        gosper_glider_gun.push(Coords {x: 5, y: 11});
-        gosper_glider_gun.push(Coords {x: 6, y: 11});
-        gosper_glider_gun.push(Coords {x: 7, y: 11});
-        gosper_glider_gun.push(Coords {x: 8, y: 12});
-        gosper_glider_gun.push(Coords {x: 4, y: 12});
-        gosper_glider_gun.push(Coords {x: 9, y: 13});
-        gosper_glider_gun.push(Coords {x: 3, y: 13});        
-        gosper_glider_gun.push(Coords {x: 9, y: 14});
-        gosper_glider_gun.push(Coords {x: 3, y: 14});
-        gosper_glider_gun.push(Coords {x: 6, y: 15});
-        gosper_glider_gun.push(Coords {x: 4, y: 16});
-        gosper_glider_gun.push(Coords {x: 8, y: 16});
-        gosper_glider_gun.push(Coords {x: 5, y: 17});
-        gosper_glider_gun.push(Coords {x: 6, y: 17});
-        gosper_glider_gun.push(Coords {x: 7, y: 17});
-        gosper_glider_gun.push(Coords {x: 6, y: 18});
-        gosper_glider_gun.push(Coords {x: 3, y: 21});
-        gosper_glider_gun.push(Coords {x: 4, y: 21});
-        gosper_glider_gun.push(Coords {x: 5, y: 21});
-        gosper_glider_gun.push(Coords {x: 3, y: 22});
-        gosper_glider_gun.push(Coords {x: 4, y: 22});
-        gosper_glider_gun.push(Coords {x: 5, y: 22});
-        gosper_glider_gun.push(Coords {x: 2, y: 23});
-        gosper_glider_gun.push(Coords {x: 6, y: 23});
-        gosper_glider_gun.push(Coords {x: 1, y: 25});
-        gosper_glider_gun.push(Coords {x: 2, y: 25});
-        gosper_glider_gun.push(Coords {x: 6, y: 25});
-        gosper_glider_gun.push(Coords {x: 7, y: 25});
-        gosper_glider_gun.push(Coords {x: 3, y: 35});
-        gosper_glider_gun.push(Coords {x: 4, y: 35});
-        gosper_glider_gun.push(Coords {x: 3, y: 36});
-        gosper_glider_gun.push(Coords {x: 4, y: 36});
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 1}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 1}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 2}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 2}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 11}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 11}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 11}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 8, y: 12}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 12}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 9, y: 13}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 13}));        
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 9, y: 14}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 14}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 15}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 16}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 8, y: 16}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 17}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 17}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 17}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 18}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 21}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 21}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 21}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 22}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 22}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 22}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 2, y: 23}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 23}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 1, y: 25}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 2, y: 25}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 25}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 25}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 35}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 35}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 36}));
+        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 36}));
         
 
         gosper_glider_gun
@@ -336,7 +344,9 @@ impl Map {
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 43, y: 170});
+    let mut map = Map::new(Coords {x: 10, y: 10});
+
+    let glider = map.glider();
 
     map.set_random();
 

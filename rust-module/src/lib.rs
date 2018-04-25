@@ -283,12 +283,19 @@ impl Map {
         self.set_alive(coords);
     }
 
+    pub fn offset(&self, coords: Coords) -> Coords {
+        Coords {
+            x: coords.x + self.offset.x,
+            y: coords.y + self.offset.y
+        }
+    }
+
     pub fn blinker(&self) -> Vec<i32> {
         let mut blinker : Vec<i32> = Vec::new();
 
-        blinker.push(self.get_pos(&Coords {x: 1, y: 2}));
-        blinker.push(self.get_pos(&Coords {x: 2, y: 2}));
-        blinker.push(self.get_pos(&Coords {x: 3, y: 2}));
+        blinker.push(self.get_pos(&self.offset(Coords {x: 1, y: 2})));
+        blinker.push(self.get_pos(&self.offset(Coords {x: 2, y: 2})));
+        blinker.push(self.get_pos(&self.offset(Coords {x: 3, y: 2})));
         
         blinker
     }
@@ -296,11 +303,11 @@ impl Map {
     pub fn glider(&self) -> Vec<i32> {
         let mut glider : Vec<i32> = Vec::new();
 
-        glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 0 + self.offset.y}));
-        glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 2 + self.offset.y}));
-        glider.push(self.get_pos(&Coords {x: 1 + self.offset.x, y: 1 + self.offset.y}));
-        glider.push(self.get_pos(&Coords {x: 1 + self.offset.x, y: 2 + self.offset.y}));
-        glider.push(self.get_pos(&Coords {x: 2 + self.offset.x, y: 1 + self.offset.y}));
+        glider.push(self.get_pos(&self.offset(Coords {x: 0, y: 0})));
+        glider.push(self.get_pos(&self.offset(Coords {x: 0, y: 2})));
+        glider.push(self.get_pos(&self.offset(Coords {x: 1, y: 1})));
+        glider.push(self.get_pos(&self.offset(Coords {x: 1, y: 2})));
+        glider.push(self.get_pos(&self.offset(Coords {x: 2, y: 1})));
 
         glider
     }
@@ -308,42 +315,42 @@ impl Map {
     pub fn gosper_glider_gun(&self) -> Vec<i32> {
         let mut gosper_glider_gun : Vec<i32> = Vec::new();
 
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 1}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 1}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 2}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 2}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 11}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 11}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 11}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 8, y: 12}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 12}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 9, y: 13}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 13}));        
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 9, y: 14}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 14}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 15}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 16}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 8, y: 16}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 17}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 17}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 17}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 18}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 21}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 21}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 21}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 22}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 22}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 22}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 2, y: 23}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 23}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 1, y: 25}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 2, y: 25}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 25}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 7, y: 25}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 35}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 35}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 3, y: 36}));
-        gosper_glider_gun.push(self.get_pos(&Coords {x: 4, y: 36}));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 1})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 1})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 2})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 2})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 11})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 11})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 11})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 8, y: 12})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 12})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 9, y: 13})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 13})));        
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 9, y: 14})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 14})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 15})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 16})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 8, y: 16})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 17})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 17})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 17})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 18})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 21})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 21})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 21})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 22})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 22})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 22})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 2, y: 23})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 23})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 1, y: 25})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 2, y: 25})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 25})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 25})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 35})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 35})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 36})));
+        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 36})));
         
 
         gosper_glider_gun

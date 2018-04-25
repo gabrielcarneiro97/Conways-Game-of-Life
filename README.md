@@ -1,3 +1,3 @@
 # Conways-Game-of-Life
 
-Conway's Game of Life in WebAssembly (Rust) + React.
+Conway's Game of Life in WebAssembly (Rust) + Phaser.

@@ -254,8 +254,6 @@ impl Map {
 
         let mut coords : Vec<Coords> = Vec::new();
 
-        println!("max>{}", max);
-
         for _ in 0..max {
             let range_x = Range::new(0usize, self.visible_size.x);
             let range_y = Range::new(0usize, self.visible_size.y);
@@ -338,16 +336,15 @@ impl Map {
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 1000, y: 1000});
+    let mut map = Map::new(Coords {x: 43, y: 170});
 
     map.set_random();
-    println!("rand end");
 
     loop {
-        // thread::sleep(Duration::from_millis(1000));
+        // thread::sleep(Duration::from_millis(200));
         print!("{}[2J", 27 as char);
         println!("------generation({})------", map.generation);
-        // map.map();
+        map.map();
         let start = PreciseTime::now();
         // println!("{:?}", map.alives);
         map.next_tick();

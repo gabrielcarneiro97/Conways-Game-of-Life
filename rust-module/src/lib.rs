@@ -9,7 +9,6 @@ extern crate bit_vec;
 
 use bit_vec::BitVec;
 
-use std::thread;
 use rand::distributions::{IndependentSample, Range};
 
 
@@ -23,22 +22,22 @@ pub enum State {
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct Coords {
-    x: usize,
-    y: usize
+    x: i32,
+    y: i32
 }
 
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Cell {
     state: State,
-    position: usize,
-    neighboors: Vec<usize>,
+    position: i32,
+    neighboors: Vec<i32>,
     neighboors_alive: i32
 }
 
 #[wasm_bindgen]
 impl Cell {
-    pub fn new(state: State, position: usize, neighboors: Vec<usize>) -> Cell {
+    pub fn new(state: State, position: i32, neighboors: Vec<i32>) -> Cell {
         Cell {
             state,
             position,
@@ -58,12 +57,12 @@ impl Cell {
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Map {
-    alives: Vec<usize>,
+    alives: Vec<i32>,
     bit_map: BitVec,
     visible_size: Coords,
     true_size: Coords,
     offset: Coords,
-    generation: usize
+    generation: i32
 }
 
 #[wasm_bindgen]
@@ -72,7 +71,7 @@ impl Map {
         let true_size = Coords {x: visible_size.x * 4, y: visible_size.y * 4};
         Map {
             alives: Vec::new(),
-            bit_map: BitVec::from_elem(true_size.x * true_size.y, false),
+            bit_map: BitVec::from_elem((true_size.x * true_size.y) as usize, false),
             offset: Coords { x: true_size.x/2, y: true_size.y/2 },
             true_size,
             visible_size,
@@ -84,8 +83,8 @@ impl Map {
     pub fn next_tick(&mut self) {
         self.generation += 1;
 
-        let mut next_gen : Vec<usize> = Vec::new();
-        let mut kill : Vec<usize> = Vec::new();
+        let mut next_gen : Vec<i32> = Vec::new();
+        let mut kill : Vec<i32> = Vec::new();
 
         for cell_bit_pos in &self.alives {
             let cell_coord = self.get_coords(*cell_bit_pos);
@@ -125,24 +124,24 @@ impl Map {
         }
 
         for pos in &next_gen {
-            self.bit_map.set(*pos, true);
+            self.bit_map.set(*pos as usize, true);
         }
 
         for to_kill in kill {
-            self.bit_map.set(to_kill, false);
+            self.bit_map.set(to_kill as usize, false);
         }
 
         self.alives = next_gen;
 
     }
 
-        pub fn find_neighboors(&self, pos: usize) -> Vec<usize> {
+        pub fn find_neighboors(&self, pos: i32) -> Vec<i32> {
         
         let coord = self.get_coords(pos);
         let x = coord.x;
         let y = coord.y;
 
-        let mut neighboors : Vec<usize> = Vec::new();
+        let mut neighboors : Vec<i32> = Vec::new();
 
         if y == 0 {
             if x == 0 {
@@ -231,26 +230,26 @@ impl Map {
         }
     }
 
-    pub fn get_pos(&self, coord: &Coords) -> usize {
+    pub fn get_pos(&self, coord: &Coords) -> i32 {
         coord.y + (coord.x * self.true_size.y)
     }
 
-    pub fn get_coords(&self, pos: usize) -> Coords {
+    pub fn get_coords(&self, pos: i32) -> Coords {
         Coords {
             x: pos / self.true_size.y,
             y: pos % self.true_size.y
         }
     }
 
-    pub fn is_alive(&self, pos: usize) -> bool {
-        self.bit_map[pos]
+    pub fn is_alive(&self, pos: i32) -> bool {
+        self.bit_map[pos as usize]
     }
 
-    pub fn set_alive(&mut self, pos_vec: Vec<usize>) {
+    pub fn set_alive(&mut self, pos_vec: Vec<i32>) {
         for pos in pos_vec {
             if !self.is_alive(pos) {
                 self.alives.push(pos);
-                self.bit_map.set(pos, true);
+                self.bit_map.set(pos as usize, true);
             }
         }
     }
@@ -267,16 +266,16 @@ impl Map {
 
         let max_range = Range::new(0, max_max);
         let mut rng = rand::thread_rng();
-        let max = max_range.ind_sample(&mut rng) as usize;
+        let max = max_range.ind_sample(&mut rng) as i32;
 
-        let mut coords : Vec<usize> = Vec::new();
+        let mut coords : Vec<i32> = Vec::new();
 
         for _ in 0..max {
-            let range_x = Range::new(0usize, self.true_size.x);
-            let range_y = Range::new(0usize, self.true_size.y);
+            let range_x = Range::new(0usize, self.true_size.x as usize);
+            let range_y = Range::new(0usize, self.true_size.y as usize);
 
-            let x = range_x.ind_sample(&mut rng);
-            let y = range_y.ind_sample(&mut rng);
+            let x = range_x.ind_sample(&mut rng) as i32;
+            let y = range_y.ind_sample(&mut rng) as i32;
 
             coords.push(self.get_pos(&Coords {x, y}));
         }
@@ -284,8 +283,8 @@ impl Map {
         self.set_alive(coords);
     }
 
-    pub fn blinker(&self) -> Vec<usize> {
-        let mut blinker : Vec<usize> = Vec::new();
+    pub fn blinker(&self) -> Vec<i32> {
+        let mut blinker : Vec<i32> = Vec::new();
 
         blinker.push(self.get_pos(&Coords {x: 1, y: 2}));
         blinker.push(self.get_pos(&Coords {x: 2, y: 2}));
@@ -294,8 +293,8 @@ impl Map {
         blinker
     }
 
-    pub fn glider(&self) -> Vec<usize> {
-        let mut glider : Vec<usize> = Vec::new();
+    pub fn glider(&self) -> Vec<i32> {
+        let mut glider : Vec<i32> = Vec::new();
 
         glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 0 + self.offset.y}));
         glider.push(self.get_pos(&Coords {x: 0 + self.offset.x, y: 2 + self.offset.y}));
@@ -306,8 +305,8 @@ impl Map {
         glider
     }
 
-    pub fn gosper_glider_gun(&self) -> Vec<usize> {
-        let mut gosper_glider_gun : Vec<usize> = Vec::new();
+    pub fn gosper_glider_gun(&self) -> Vec<i32> {
+        let mut gosper_glider_gun : Vec<i32> = Vec::new();
 
         gosper_glider_gun.push(self.get_pos(&Coords {x: 5, y: 1}));
         gosper_glider_gun.push(self.get_pos(&Coords {x: 6, y: 1}));
@@ -351,3 +350,4 @@ impl Map {
     }
 
 }
+

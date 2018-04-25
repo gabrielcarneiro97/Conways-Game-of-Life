@@ -242,8 +242,8 @@ impl Map {
 
         let max_max;
 
-        if self.visible_size.x * self.visible_size.y / 2 > 5000 {
-            max_max = 5000;
+        if self.visible_size.x * self.visible_size.y / 2 > 10000 {
+            max_max = 10000;
         } else {
             max_max = self.visible_size.x * self.visible_size.y / 2;
         }
@@ -338,18 +338,21 @@ impl Map {
 }
 
 fn main() {
-    let mut map = Map::new(Coords {x: 40, y: 100});
+    let mut map = Map::new(Coords {x: 1000, y: 1000});
 
     map.set_random();
+    println!("rand end");
 
     loop {
         // thread::sleep(Duration::from_millis(1000));
         print!("{}[2J", 27 as char);
         println!("------generation({})------", map.generation);
-        map.map();
+        // map.map();
         let start = PreciseTime::now();
+        // println!("{:?}", map.alives);
         map.next_tick();
         let end = PreciseTime::now();
         println!("-------time({})-------", start.to(end));
     }
+    
 }

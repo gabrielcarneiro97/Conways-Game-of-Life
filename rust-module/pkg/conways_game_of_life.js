@@ -70,6 +70,48 @@ export function ver1() {
     return realRet;
 }
 
+export class Coords {
+
+                static __construct(ptr) {
+                    return new Coords(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_coords_free(ptr);
+            }
+        }
+
+export class Cell {
+
+                static __construct(ptr) {
+                    return new Cell(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_cell_free(ptr);
+            }
+        static new(arg0, arg1, arg2) {
+    const [ptr2, len2] = passArray32ToWasm(arg2);
+    setGlobalArgument(len2, 0);
+    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
+}
+change_state() {
+    return wasm.cell_change_state(this.ptr);
+}
+}
+
 export class Map {
 
                 static __construct(ptr) {
@@ -161,48 +203,6 @@ gosper_glider_gun() {
     return realRet;
 }
 }
-
-export class Cell {
-
-                static __construct(ptr) {
-                    return new Cell(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_cell_free(ptr);
-            }
-        static new(arg0, arg1, arg2) {
-    const [ptr2, len2] = passArray32ToWasm(arg2);
-    setGlobalArgument(len2, 0);
-    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
-}
-change_state() {
-    return wasm.cell_change_state(this.ptr);
-}
-}
-
-export class Coords {
-
-                static __construct(ptr) {
-                    return new Coords(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_coords_free(ptr);
-            }
-        }
 
 export function __wbindgen_throw(ptr, len) {
     throw new Error(getStringFromWasm(ptr, len));

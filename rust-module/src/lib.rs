@@ -260,6 +260,7 @@ impl Map {
         }
     }
     
+    //Função não está funcionando no WASM, apenas no RUST
     pub fn set_random(&mut self) {
 
         let max_max;
@@ -367,5 +368,10 @@ impl Map {
 #[wasm_bindgen]
 pub fn new_map(x: i32, y: i32) -> Map {
     Map::new(Coords {x, y})
+}
+
+#[wasm_bindgen]
+pub fn ver1() -> String {
+    String::from("0.0.2")
 }
 

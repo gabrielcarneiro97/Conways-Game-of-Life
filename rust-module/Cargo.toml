@@ -1,7 +1,10 @@
 [package]
 name = "conways_game_of_life"
 version = "0.1.0"
+description = "Conway's Game of Life for WASM"
 authors = ["Gabriel Carneiro <gabriel.carneiro97@live.com>"]
+license = "MIT"
+repository = "https://github.com/gabrielcarneiro97/Conways-Game-of-Life"
 
 [lib]
 crate-type = ["cdylib"]

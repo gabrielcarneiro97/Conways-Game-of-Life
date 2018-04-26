@@ -7,6 +7,7 @@ const cellSide = 10
 
 const dead_fill = 0xF2F2F2
 const alive_fill = 0x3C8C30
+const was_alive_fill = 0xC5FFD7
 
 class Cell {
   constructor(x, y, width, height) {
@@ -41,7 +42,7 @@ class Cell {
 
     this.set_dead = (graphics) => {
       this.isAlive = false
-      graphics.beginFill(dead_fill)
+      graphics.beginFill(was_alive_fill)
       graphics.drawRect(x, y, width, height)
       graphics.endFill()
     } 
@@ -100,7 +101,7 @@ wasm.then(conways => {
 
   let define_map = (prev_alives, alives) => {
 
-    for (let i = 0; i < prev_alives; i ++) {
+    for (let i = 0; i < prev_alives.length; i ++) {
       let x = parseInt(prev_alives[i] % y_map)
       let y = parseInt(prev_alives[i] / y_map)
 
@@ -118,15 +119,14 @@ wasm.then(conways => {
     return alives
   } 
 
-  let c = define_map([], map.get_map_alives())
+  let prev = define_map([], map.get_map_alives())
+
+  setInterval(() => {
   map.next_tick()
+  prev = define_map(prev, map.get_map_alives())
 
-  define_map(c, map.get_map_alives())
+  }, 100)
 
-
-  app.ticker.add((dTime) => {
-
-  })
 
 })
 

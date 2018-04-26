@@ -87,31 +87,6 @@ export class Coords {
             }
         }
 
-export class Cell {
-
-                static __construct(ptr) {
-                    return new Cell(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_cell_free(ptr);
-            }
-        static new(arg0, arg1, arg2) {
-    const [ptr2, len2] = passArray32ToWasm(arg2);
-    setGlobalArgument(len2, 0);
-    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
-}
-change_state() {
-    return wasm.cell_change_state(this.ptr);
-}
-}
-
 export class Map {
 
                 static __construct(ptr) {
@@ -159,6 +134,13 @@ get_map() {
     wasm.__wbindgen_free(ret, len * 4);
     return realRet;
 }
+get_map_alives() {
+    const ret = wasm.map_get_map_alives(this.ptr);
+    const len = getGlobalArgument(0);
+    const realRet = getArrayI32FromWasm(ret, len);
+    wasm.__wbindgen_free(ret, len * 4);
+    return realRet;
+}
 get_pos(arg0) {
     return wasm.map_get_pos(this.ptr, arg0.ptr);
 }
@@ -201,6 +183,31 @@ gosper_glider_gun() {
     const realRet = getArrayI32FromWasm(ret, len);
     wasm.__wbindgen_free(ret, len * 4);
     return realRet;
+}
+}
+
+export class Cell {
+
+                static __construct(ptr) {
+                    return new Cell(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_cell_free(ptr);
+            }
+        static new(arg0, arg1, arg2) {
+    const [ptr2, len2] = passArray32ToWasm(arg2);
+    setGlobalArgument(len2, 0);
+    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
+}
+change_state() {
+    return wasm.cell_change_state(this.ptr);
 }
 }
 

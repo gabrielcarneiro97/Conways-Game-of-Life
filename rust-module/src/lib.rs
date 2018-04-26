@@ -236,6 +236,25 @@ impl Map {
         vec
     }
 
+    pub fn get_map_alives(&self) -> Vec<i32> {
+
+        let x_offset = self.offset.x;
+        let y_offset = self.offset.y;
+        let x_max = self.visible_size.x + x_offset;
+        let y_max = self.visible_size.y + y_offset;
+
+        let mut vec : Vec<i32> = Vec::new();
+
+        for x in x_offset..x_max {
+            for y in y_offset..y_max {
+                if self.is_alive(self.get_pos(&Coords {x, y})) {
+                    vec.push((y - y_offset) + ((x - x_offset) * self.visible_size.y));
+                }
+            }
+        }
+        vec
+    }
+
     pub fn get_pos(&self, coord: &Coords) -> i32 {
         coord.y + (coord.x * self.true_size.y)
     }

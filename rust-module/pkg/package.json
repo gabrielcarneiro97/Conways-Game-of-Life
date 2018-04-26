@@ -1,1 +1,1 @@
-{"name":"conways_game_of_life","description":"Conway's Game of Life for WASM","version":"0.1.0","license":"MIT","repository":{"type":"git","url":"https://github.com/gabrielcarneiro97/Conways-Game-of-Life"},"files":["conways_game_of_life.js","conways_game_of_life_bg.wasm"]}
+{"name":"conways_game_of_life","description":"Conway's Game of Life for WASM","version":"0.1.1","license":"MIT","repository":{"type":"git","url":"https://github.com/gabrielcarneiro97/Conways-Game-of-Life"},"files":["conways_game_of_life.js","conways_game_of_life_bg.wasm"]}

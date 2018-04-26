@@ -4,13 +4,12 @@
     "build": "webpack"
   },
   "devDependencies": {
-    "raw-loader": "^0.5.1",
     "webpack": "^4.0.1",
     "webpack-cli": "^2.0.10",
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
     "conways_game_of_life": "^0.1.0",
-    "phaser": "^3.6.0"
+    "pixi.js": "^4.7.3"
   }
 }

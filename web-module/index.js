@@ -122,8 +122,8 @@ wasm.then(conways => {
   let prev = define_map([], map.get_map_alives())
 
   setInterval(() => {
-  map.next_tick()
-  prev = define_map(prev, map.get_map_alives())
+    map.next_tick()
+    prev = define_map(prev, map.get_map_alives())
 
   }, 100)
 

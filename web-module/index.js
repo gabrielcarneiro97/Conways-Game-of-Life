@@ -23,12 +23,12 @@ class Cell {
       if (this.isAlive) {
         this.isAlive = false
         graphics.beginFill(dead_fill)
-        graphics.drawRect(x, y, width, height)
+        graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
         graphics.endFill()
       } else {
         this.isAlive = true
         graphics.beginFill(alive_fill)
-        graphics.drawRect(x, y, width, height)
+        graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
         graphics.endFill()
       }
     }
@@ -36,15 +36,12 @@ class Cell {
     this.set_alive = (graphics) => {
       this.isAlive = true
       graphics.beginFill(alive_fill)
-      graphics.drawRect(x, y, width, height)
+      graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
       graphics.endFill()
     }
 
-    this.set_dead = (graphics) => {
+    this.set_dead = () => {
       this.isAlive = false
-      graphics.beginFill(was_alive_fill)
-      graphics.drawRect(x, y, width, height)
-      graphics.endFill()
     } 
   }
 
@@ -58,13 +55,17 @@ wasm.then(conways => {
   let container = new PIXI.Container()
   container.interactive = true
 
-  let graphics = new PIXI.Graphics()
-  graphics.lineStyle(1, 0x141414)  
+  let grid = new PIXI.Graphics()
+  grid.lineStyle(1, 0x141414)
 
-  container.addChild(graphics)
+  let alives_grid = new PIXI.Graphics()
+  alives_grid.lineStyle(1, 0x141414)
+
+  container.addChild(grid)
+  container.addChild(alives_grid)
   app.stage.addChild(container)
 
-  graphics.beginFill(dead_fill)
+  grid.beginFill(dead_fill)
 
   let cell_arr = []
 
@@ -74,11 +75,11 @@ wasm.then(conways => {
       let cell = new Cell(x * cellSide, y * cellSide, cellSide, cellSide)
       cell_arr[x][y] = cell
 
-      graphics.drawRect(cell.x, cell.y, cell.width, cell.height)
+      grid.drawRect(cell.x, cell.y, cell.width, cell.height)
     }
   }
 
-  graphics.endFill()
+  grid.endFill()
 
 
   container.on('click', (e) => {
@@ -90,7 +91,7 @@ wasm.then(conways => {
 
     let cell = cell_arr[cell_x][cell_y]
 
-    cell.change_state(graphics)
+    cell.change_state(alives_grid)
 
 
   })
@@ -101,18 +102,20 @@ wasm.then(conways => {
 
   let define_map = (prev_alives, alives) => {
 
+    alives_grid.clear()
+
     for (let i = 0; i < prev_alives.length; i ++) {
       let x = parseInt(prev_alives[i] % y_map)
       let y = parseInt(prev_alives[i] / y_map)
 
-      cell_arr[x][y].set_dead(graphics)
+      cell_arr[x][y].set_dead()
     }
 
     for (let i = 0; i < alives.length; i++) {
       let x = parseInt(alives[i] % y_map)
       let y = parseInt(alives[i] / y_map)
 
-    cell_arr[x][y].set_alive(graphics)
+      cell_arr[x][y].set_alive(alives_grid)
 
     }
 

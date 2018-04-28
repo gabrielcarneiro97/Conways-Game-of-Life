@@ -87,6 +87,31 @@ export class Coords {
             }
         }
 
+export class Cell {
+
+                static __construct(ptr) {
+                    return new Cell(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_cell_free(ptr);
+            }
+        static new(arg0, arg1, arg2) {
+    const [ptr2, len2] = passArray32ToWasm(arg2);
+    setGlobalArgument(len2, 0);
+    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
+}
+change_state() {
+    return wasm.cell_change_state(this.ptr);
+}
+}
+
 export class Map {
 
                 static __construct(ptr) {
@@ -158,13 +183,20 @@ set_alive(arg0) {
 set_random() {
     return wasm.map_set_random(this.ptr);
 }
-offset(arg0) {
+offset_pos(arg0) {
     const ptr0 = arg0.ptr;
     arg0.ptr = 0;
-    return Coords.__construct(wasm.map_offset(this.ptr, ptr0));
+    return wasm.map_offset_pos(this.ptr, ptr0);
 }
 blinker() {
     const ret = wasm.map_blinker(this.ptr);
+    const len = getGlobalArgument(0);
+    const realRet = getArrayI32FromWasm(ret, len);
+    wasm.__wbindgen_free(ret, len * 4);
+    return realRet;
+}
+party() {
+    const ret = wasm.map_party(this.ptr);
     const len = getGlobalArgument(0);
     const realRet = getArrayI32FromWasm(ret, len);
     wasm.__wbindgen_free(ret, len * 4);
@@ -183,31 +215,6 @@ gosper_glider_gun() {
     const realRet = getArrayI32FromWasm(ret, len);
     wasm.__wbindgen_free(ret, len * 4);
     return realRet;
-}
-}
-
-export class Cell {
-
-                static __construct(ptr) {
-                    return new Cell(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_cell_free(ptr);
-            }
-        static new(arg0, arg1, arg2) {
-    const [ptr2, len2] = passArray32ToWasm(arg2);
-    setGlobalArgument(len2, 0);
-    return Cell.__construct(wasm.cell_new(arg0, arg1, ptr2));
-}
-change_state() {
-    return wasm.cell_change_state(this.ptr);
 }
 }
 

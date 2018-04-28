@@ -309,31 +309,80 @@ impl Map {
         self.set_alive(coords);
     }
 
-    pub fn offset(&self, coords: Coords) -> Coords {
-        Coords {
+    pub fn offset_pos(&self, coords: Coords) -> i32 {
+        self.get_pos(&Coords {
             x: coords.x + self.offset.x,
             y: coords.y + self.offset.y
-        }
+        })
     }
 
     pub fn blinker(&self) -> Vec<i32> {
         let mut blinker : Vec<i32> = Vec::new();
 
-        blinker.push(self.get_pos(&self.offset(Coords {x: 1, y: 2})));
-        blinker.push(self.get_pos(&self.offset(Coords {x: 2, y: 2})));
-        blinker.push(self.get_pos(&self.offset(Coords {x: 3, y: 2})));
+        blinker.push(self.offset_pos(Coords {x: 0, y: 1}));
+        blinker.push(self.offset_pos(Coords {x: 1, y: 1}));
+        blinker.push(self.offset_pos(Coords {x: 2, y: 1}));
         
         blinker
+    }
+
+    pub fn party(&self) -> Vec<i32> {
+        let mut party : Vec<i32> = Vec::new();
+
+        party.push(self.offset_pos(Coords {x: 3, y: 6}));
+        party.push(self.offset_pos(Coords {x: 1, y: 12}));
+        party.push(self.offset_pos(Coords {x: 3, y: 2}));
+        party.push(self.offset_pos(Coords {x: 8, y: 1}));
+        party.push(self.offset_pos(Coords {x: 3, y: 9}));
+        party.push(self.offset_pos(Coords {x: 0, y: 6}));
+        party.push(self.offset_pos(Coords {x: 3, y: 12}));
+        party.push(self.offset_pos(Coords {x: 4, y: 6}));
+        party.push(self.offset_pos(Coords {x: 3, y: 5}));
+        party.push(self.offset_pos(Coords {x: 3, y: 2}));
+        party.push(self.offset_pos(Coords {x: 34, y: 6}));
+        party.push(self.offset_pos(Coords {x: 3, y: 43}));
+        party.push(self.offset_pos(Coords {x: 3, y: 14}));
+        party.push(self.offset_pos(Coords {x: 32, y: 56}));
+        party.push(self.offset_pos(Coords {x: 23, y: 16}));
+        party.push(self.offset_pos(Coords {x: 32, y: 6}));
+        party.push(self.offset_pos(Coords {x: 13, y: 16}));
+        party.push(self.offset_pos(Coords {x: 23, y: 43}));
+        party.push(self.offset_pos(Coords {x: 23, y: 16}));
+        party.push(self.offset_pos(Coords {x: 13, y: 56}));
+        party.push(self.offset_pos(Coords {x: 63, y: 46}));
+        party.push(self.offset_pos(Coords {x: 73, y: 46}));
+        party.push(self.offset_pos(Coords {x: 13, y: 16}));
+        party.push(self.offset_pos(Coords {x: 13, y: 17}));
+        party.push(self.offset_pos(Coords {x: 13, y: 18}));
+        party.push(self.offset_pos(Coords {x: 13, y: 19}));
+        party.push(self.offset_pos(Coords {x: 31, y: 6}));
+        party.push(self.offset_pos(Coords {x: 31, y: 7}));
+        party.push(self.offset_pos(Coords {x: 31, y: 8}));
+        party.push(self.offset_pos(Coords {x: 37, y: 14}));
+        party.push(self.offset_pos(Coords {x: 37, y: 15}));
+        party.push(self.offset_pos(Coords {x: 37, y: 16}));
+        party.push(self.offset_pos(Coords {x: 32, y: 26}));
+        party.push(self.offset_pos(Coords {x: 31, y: 36}));
+        party.push(self.offset_pos(Coords {x: 31, y: 46}));
+        party.push(self.offset_pos(Coords {x: 32, y: 56}));
+        party.push(self.offset_pos(Coords {x: 31, y: 7}));
+        party.push(self.offset_pos(Coords {x: 63, y: 8}));
+        party.push(self.offset_pos(Coords {x: 45, y: 9}));
+        party.push(self.offset_pos(Coords {x: 12, y: 0}));
+        
+
+
+        party
     }
 
     pub fn glider(&self) -> Vec<i32> {
         let mut glider : Vec<i32> = Vec::new();
 
-        glider.push(self.get_pos(&self.offset(Coords {x: 0, y: 0})));
-        glider.push(self.get_pos(&self.offset(Coords {x: 0, y: 2})));
-        glider.push(self.get_pos(&self.offset(Coords {x: 1, y: 1})));
-        glider.push(self.get_pos(&self.offset(Coords {x: 1, y: 2})));
-        glider.push(self.get_pos(&self.offset(Coords {x: 2, y: 1})));
+        glider.push(self.offset_pos(Coords {x: 0, y: 0}));
+        glider.push(self.offset_pos(Coords {x: 0, y: 2}));
+        glider.push(self.offset_pos(Coords {x: 1, y: 1}));
+        glider.push(self.offset_pos(Coords {x: 1, y: 2}));
+        glider.push(self.offset_pos(Coords {x: 2, y: 1}));
 
         glider
     }
@@ -341,42 +390,42 @@ impl Map {
     pub fn gosper_glider_gun(&self) -> Vec<i32> {
         let mut gosper_glider_gun : Vec<i32> = Vec::new();
 
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 1})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 1})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 2})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 2})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 11})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 11})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 11})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 8, y: 12})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 12})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 9, y: 13})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 13})));        
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 9, y: 14})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 14})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 15})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 16})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 8, y: 16})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 17})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 17})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 17})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 18})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 21})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 21})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 21})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 22})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 22})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 5, y: 22})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 2, y: 23})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 23})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 1, y: 25})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 2, y: 25})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 6, y: 25})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 7, y: 25})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 35})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 35})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 3, y: 36})));
-        gosper_glider_gun.push(self.get_pos(&self.offset(Coords {x: 4, y: 36})));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 1}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 1}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 2}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 2}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 11}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 11}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 7, y: 11}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 8, y: 12}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 12}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 9, y: 13}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 13}));        
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 9, y: 14}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 14}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 15}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 16}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 8, y: 16}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 17}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 17}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 7, y: 17}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 18}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 21}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 21}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 21}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 22}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 22}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 5, y: 22}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 2, y: 23}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 23}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 1, y: 25}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 2, y: 25}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 6, y: 25}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 7, y: 25}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 35}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 35}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 36}));
+        gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 36}));
         
 
         gosper_glider_gun

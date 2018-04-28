@@ -1,12 +1,15 @@
 import * as PIXI from 'pixi.js'
+import { print } from 'util';
 
 const wasm = import('conways_game_of_life/conways_game_of_life')
 const x_map = 80
 const y_map = 60
+const x_true = x_map * 4
+const y_true = y_map * 4
 const cellSide = 10
 
 const dead_fill = 0xF2F2F2
-const alive_fill = 0x3C8C30
+const alive_fill = parseInt(((1<<24)*Math.random()|0).toString(16), 16)
 const was_alive_fill = 0xC5FFD7
 
 class Cell {
@@ -35,7 +38,7 @@ class Cell {
 
     this.set_alive = (graphics) => {
       this.isAlive = true
-      graphics.beginFill(alive_fill)
+      graphics.beginFill(parseInt(((1<<24)*Math.random()|0).toString(16), 16))
       graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
       graphics.endFill()
     }
@@ -96,8 +99,22 @@ wasm.then(conways => {
 
   })
 
-  map.set_alive(map.gosper_glider_gun())
+  let random_map = () => {
+    let random = []
 
+    for (let i = 0; i < 50000; i++) {
+      let x = Math.floor(Math.random() * x_true)
+      let y = Math.floor(Math.random() * y_true)
+  
+      let pos = y + (x * y_true)
+      random.push(pos)
+    }
+
+    return random
+  }
+
+
+  map.set_alive(random_map())
 
 
   let define_map = (prev_alives, alives) => {
@@ -105,18 +122,20 @@ wasm.then(conways => {
     alives_grid.clear()
 
     for (let i = 0; i < prev_alives.length; i ++) {
-      let x = parseInt(prev_alives[i] % y_map)
-      let y = parseInt(prev_alives[i] / y_map)
-
-      cell_arr[x][y].set_dead()
+      let x = parseInt(prev_alives[i] / y_map)
+      let y = parseInt(prev_alives[i] % y_map)
+      if (x < x_map && y < y_map) {
+        cell_arr[x][y].set_dead()
+      }
     }
 
     for (let i = 0; i < alives.length; i++) {
-      let x = parseInt(alives[i] % y_map)
-      let y = parseInt(alives[i] / y_map)
+      let x = parseInt(alives[i] / y_map)
+      let y = parseInt(alives[i] % y_map)
 
-      cell_arr[x][y].set_alive(alives_grid)
-
+      if (x < x_map && y < y_map) {
+        cell_arr[x][y].set_alive(alives_grid)        
+      }
     }
 
     return alives

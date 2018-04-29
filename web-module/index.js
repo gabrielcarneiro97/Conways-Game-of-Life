@@ -2,11 +2,11 @@ import * as PIXI from 'pixi.js'
 import { print } from 'util';
 
 const wasm = import('conways_game_of_life/conways_game_of_life')
-const x_map = 80
-const y_map = 60
+const x_map = 40
+const y_map = 30
 const x_true = x_map * 4
 const y_true = y_map * 4
-const cellSide = 10
+const cellSide = 20
 
 const dead_fill = 0xF2F2F2
 const alive_fill = parseInt(((1<<24)*Math.random()|0).toString(16), 16)
@@ -38,7 +38,7 @@ class Cell {
 
     this.set_alive = (graphics) => {
       this.isAlive = true
-      graphics.beginFill(parseInt(((1<<24)*Math.random()|0).toString(16), 16))
+      graphics.beginFill(alive_fill)
       graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
       graphics.endFill()
     }
@@ -102,7 +102,7 @@ wasm.then(conways => {
   let random_map = () => {
     let random = []
 
-    for (let i = 0; i < 50000; i++) {
+    for (let i = 0; i < 10000; i++) {
       let x = Math.floor(Math.random() * x_true)
       let y = Math.floor(Math.random() * y_true)
   
@@ -147,7 +147,7 @@ wasm.then(conways => {
     map.next_tick()
     prev = define_map(prev, map.get_map_alives())
 
-  }, 100)
+  }, 300)
 
 
 })

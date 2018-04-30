@@ -354,9 +354,3 @@ impl Map {
 pub fn new_map(x: i32, y: i32) -> Map {
     Map::new(Coords {x, y})
 }
-
-#[wasm_bindgen]
-pub fn ver1() -> String {
-    String::from("0.0.2")
-}
-

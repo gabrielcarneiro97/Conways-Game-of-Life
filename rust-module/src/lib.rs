@@ -292,55 +292,6 @@ impl Map {
         blinker
     }
 
-    pub fn party(&self) -> Vec<i32> {
-        let mut party : Vec<i32> = Vec::new();
-
-        party.push(self.offset_pos(Coords {x: 3, y: 6}));
-        party.push(self.offset_pos(Coords {x: 1, y: 12}));
-        party.push(self.offset_pos(Coords {x: 3, y: 2}));
-        party.push(self.offset_pos(Coords {x: 8, y: 1}));
-        party.push(self.offset_pos(Coords {x: 3, y: 9}));
-        party.push(self.offset_pos(Coords {x: 0, y: 6}));
-        party.push(self.offset_pos(Coords {x: 3, y: 12}));
-        party.push(self.offset_pos(Coords {x: 4, y: 6}));
-        party.push(self.offset_pos(Coords {x: 3, y: 5}));
-        party.push(self.offset_pos(Coords {x: 3, y: 2}));
-        party.push(self.offset_pos(Coords {x: 34, y: 6}));
-        party.push(self.offset_pos(Coords {x: 3, y: 43}));
-        party.push(self.offset_pos(Coords {x: 3, y: 14}));
-        party.push(self.offset_pos(Coords {x: 32, y: 56}));
-        party.push(self.offset_pos(Coords {x: 23, y: 16}));
-        party.push(self.offset_pos(Coords {x: 32, y: 6}));
-        party.push(self.offset_pos(Coords {x: 13, y: 16}));
-        party.push(self.offset_pos(Coords {x: 23, y: 43}));
-        party.push(self.offset_pos(Coords {x: 23, y: 16}));
-        party.push(self.offset_pos(Coords {x: 13, y: 56}));
-        party.push(self.offset_pos(Coords {x: 63, y: 46}));
-        party.push(self.offset_pos(Coords {x: 73, y: 46}));
-        party.push(self.offset_pos(Coords {x: 13, y: 16}));
-        party.push(self.offset_pos(Coords {x: 13, y: 17}));
-        party.push(self.offset_pos(Coords {x: 13, y: 18}));
-        party.push(self.offset_pos(Coords {x: 13, y: 19}));
-        party.push(self.offset_pos(Coords {x: 31, y: 6}));
-        party.push(self.offset_pos(Coords {x: 31, y: 7}));
-        party.push(self.offset_pos(Coords {x: 31, y: 8}));
-        party.push(self.offset_pos(Coords {x: 37, y: 14}));
-        party.push(self.offset_pos(Coords {x: 37, y: 15}));
-        party.push(self.offset_pos(Coords {x: 37, y: 16}));
-        party.push(self.offset_pos(Coords {x: 32, y: 26}));
-        party.push(self.offset_pos(Coords {x: 31, y: 36}));
-        party.push(self.offset_pos(Coords {x: 31, y: 46}));
-        party.push(self.offset_pos(Coords {x: 32, y: 56}));
-        party.push(self.offset_pos(Coords {x: 31, y: 7}));
-        party.push(self.offset_pos(Coords {x: 63, y: 8}));
-        party.push(self.offset_pos(Coords {x: 45, y: 9}));
-        party.push(self.offset_pos(Coords {x: 12, y: 0}));
-        
-
-
-        party
-    }
-
     pub fn glider(&self) -> Vec<i32> {
         let mut glider : Vec<i32> = Vec::new();
 

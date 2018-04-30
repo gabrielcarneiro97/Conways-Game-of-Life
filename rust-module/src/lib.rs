@@ -279,36 +279,6 @@ impl Map {
         }
     }
     
-    //Função não está funcionando no WASM, apenas no RUST
-    pub fn set_random(&mut self) {
-
-        let max_max;
-
-        if self.true_size.x * self.true_size.y / 2 > 10000 {
-            max_max = 10000;
-        } else {
-            max_max = self.true_size.x * self.true_size.y / 2;
-        }
-
-        let max_range = Range::new(0, max_max);
-        let mut rng = rand::thread_rng();
-        let max = max_range.ind_sample(&mut rng) as i32;
-
-        let mut coords : Vec<i32> = Vec::new();
-
-        for _ in 0..max {
-            let range_x = Range::new(0usize, self.true_size.x as usize);
-            let range_y = Range::new(0usize, self.true_size.y as usize);
-
-            let x = range_x.ind_sample(&mut rng) as i32;
-            let y = range_y.ind_sample(&mut rng) as i32;
-
-            coords.push(self.get_pos(&Coords {x, y}));
-        }
-
-        self.set_alive(coords);
-    }
-
     pub fn offset_pos(&self, coords: Coords) -> i32 {
         self.get_pos(&Coords {
             x: coords.x + self.offset.x,

@@ -4,13 +4,9 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
-extern crate rand;
 extern crate bit_vec;
 
 use bit_vec::BitVec;
-
-use rand::distributions::{IndependentSample, Range};
-
 
 #[derive(PartialEq, Debug, Clone)]
 #[wasm_bindgen]

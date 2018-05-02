@@ -4,7 +4,7 @@
     "Gabriel Carneiro <gabriel.carneiro97@live.com>"
   ],
   "description": "Conway's Game of Life for WASM",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
+const wasm = import('../rust-module/pkg/conways_game_of_life')
 
-const wasm = import('conways_game_of_life/conways_game_of_life')
 const xMap = 40
 const yMap = 30
 const xTrue = xMap * 4
@@ -106,7 +106,7 @@ wasm.then(conways => {
     return random
   }
 
-  map.setAlive(randomMap())
+  map.set_alive(randomMap())
 
   let defineMap = (prevAlives, alives) => {
     alivesGrid.clear()

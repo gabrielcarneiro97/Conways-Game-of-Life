@@ -1,4 +1,7 @@
 {
+  "name": "conways-game-of-life",
+  "version": "0.1.0",
+  "license": "MIT",
   "scripts": {
     "serve": "webpack-dev-server",
     "build": "webpack"
@@ -9,7 +12,6 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
-    "conways_game_of_life": "^0.1.1",
     "pixi.js": "^4.7.3"
   }
 }

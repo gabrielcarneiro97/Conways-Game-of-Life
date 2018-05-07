@@ -1,20 +1,17 @@
 import * as PIXI from 'pixi.js'
-import { print } from 'util';
 
 const wasm = import('conways_game_of_life/conways_game_of_life')
-const x_map = 40
-const y_map = 30
-const x_true = x_map * 4
-const y_true = y_map * 4
+const xMap = 40
+const yMap = 30
+const xTrue = xMap * 4
+const yTrue = yMap * 4
 const cellSide = 20
 
-const dead_fill = 0xF2F2F2
-const alive_fill = parseInt(((1<<24)*Math.random()|0).toString(16), 16)
-const was_alive_fill = 0xC5FFD7
+const deadFill = 0xF2F2F2
+const aliveFill = parseInt(((1 << 24) * Math.random() | 0).toString(16), 16)
 
 class Cell {
-  constructor(x, y, width, height) {
-
+  constructor (x, y, width, height) {
     this.isAlive = false
 
     this.x = x
@@ -22,61 +19,60 @@ class Cell {
     this.width = width
     this.height = height
 
-    this.change_state = (graphics) => { 
+    this.change_state = (graphics) => {
       if (this.isAlive) {
         this.isAlive = false
-        graphics.beginFill(dead_fill)
-        graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
+        graphics.beginFill(deadFill)
+        graphics.drawRect(x + 0.5, y + 0.5, width - 1, height - 1)
         graphics.endFill()
       } else {
         this.isAlive = true
-        graphics.beginFill(alive_fill)
-        graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
+        graphics.beginFill(aliveFill)
+        graphics.drawRect(x + 0.5, y + 0.5, width - 1, height - 1)
         graphics.endFill()
       }
     }
 
     this.set_alive = (graphics) => {
       this.isAlive = true
-      graphics.beginFill(alive_fill)
-      graphics.drawRect(x + .5, y + .5, width - 1, height - 1)
+      graphics.beginFill(aliveFill)
+      graphics.drawRect(x + 0.5, y + 0.5, width - 1, height - 1)
       graphics.endFill()
     }
 
     this.set_dead = () => {
       this.isAlive = false
-    } 
+    }
   }
-
 }
 
 wasm.then(conways => {
   const app = new PIXI.Application()
-  let map = conways.new_map(x_map, y_map)  
+  let map = conways.new_map(xMap, yMap)
   document.body.appendChild(app.view)
-  
+
   let container = new PIXI.Container()
   container.interactive = true
 
   let grid = new PIXI.Graphics()
   grid.lineStyle(1, 0x141414)
 
-  let alives_grid = new PIXI.Graphics()
-  alives_grid.lineStyle(1, 0x141414)
+  let alivesGrid = new PIXI.Graphics()
+  alivesGrid.lineStyle(1, 0x141414)
 
   container.addChild(grid)
-  container.addChild(alives_grid)
+  container.addChild(alivesGrid)
   app.stage.addChild(container)
 
-  grid.beginFill(dead_fill)
+  grid.beginFill(deadFill)
 
-  let cell_arr = []
+  let cellArr = []
 
-  for (let x = 0; x < x_map; x++) {
-    cell_arr[x] = []
-    for (let y = 0; y < y_map; y++) {
+  for (let x = 0; x < xMap; x++) {
+    cellArr[x] = []
+    for (let y = 0; y < yMap; y++) {
       let cell = new Cell(x * cellSide, y * cellSide, cellSide, cellSide)
-      cell_arr[x][y] = cell
+      cellArr[x][y] = cell
 
       grid.drawRect(cell.x, cell.y, cell.width, cell.height)
     }
@@ -84,71 +80,61 @@ wasm.then(conways => {
 
   grid.endFill()
 
-
   container.on('click', (e) => {
-    let click_x = e.data.global.x
-    let click_y = e.data.global.y
+    let clickX = e.data.global.x
+    let clickY = e.data.global.y
 
-    let cell_x = parseInt(click_x / cellSide)
-    let cell_y = parseInt(click_y / cellSide)
+    let cellX = parseInt(clickX / cellSide)
+    let cellY = parseInt(clickY / cellSide)
 
-    let cell = cell_arr[cell_x][cell_y]
+    let cell = cellArr[cellX][cellY]
 
-    cell.change_state(alives_grid)
-
-
+    cell.change_state(alivesGrid)
   })
 
-  let random_map = () => {
+  let randomMap = () => {
     let random = []
 
     for (let i = 0; i < 10000; i++) {
-      let x = Math.floor(Math.random() * x_true)
-      let y = Math.floor(Math.random() * y_true)
-  
-      let pos = y + (x * y_true)
+      let x = Math.floor(Math.random() * xTrue)
+      let y = Math.floor(Math.random() * yTrue)
+
+      let pos = y + (x * yTrue)
       random.push(pos)
     }
 
     return random
   }
 
+  map.set_alive(randomMap())
 
-  map.set_alive(random_map())
+  let defineMap = (prevAlives, alives) => {
+    alivesGrid.clear()
 
-
-  let define_map = (prev_alives, alives) => {
-
-    alives_grid.clear()
-
-    for (let i = 0; i < prev_alives.length; i ++) {
-      let x = parseInt(prev_alives[i] / y_map)
-      let y = parseInt(prev_alives[i] % y_map)
-      if (x < x_map && y < y_map) {
-        cell_arr[x][y].set_dead()
+    for (let i = 0; i < prevAlives.length; i++) {
+      let x = parseInt(prevAlives[i] / yMap)
+      let y = parseInt(prevAlives[i] % yMap)
+      if (x < xMap && y < yMap) {
+        cellArr[x][y].set_dead()
       }
     }
 
     for (let i = 0; i < alives.length; i++) {
-      let x = parseInt(alives[i] / y_map)
-      let y = parseInt(alives[i] % y_map)
+      let x = parseInt(alives[i] / yMap)
+      let y = parseInt(alives[i] % yMap)
 
-      if (x < x_map && y < y_map) {
-        cell_arr[x][y].set_alive(alives_grid)        
+      if (x < xMap && y < yMap) {
+        cellArr[x][y].set_alive(alivesGrid)
       }
     }
 
     return alives
-  } 
+  }
 
-  let prev = define_map([], map.get_map_alives())
+  let prev = defineMap([], map.get_map_alives())
 
   setInterval(() => {
     map.next_tick()
-    prev = define_map(prev, map.get_map_alives())
-
+    prev = defineMap(prev, map.get_map_alives())
   }, 300)
-
-
 })
-

@@ -1,4 +1,4 @@
-# Conways-Game-of-Life
+# Conway's Game of Life (WASM :heart:)
 
 Conway's Game of Life in WebAssembly (Rust) + PIXI.js
 

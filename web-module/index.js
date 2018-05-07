@@ -19,7 +19,7 @@ class Cell {
     this.width = width
     this.height = height
 
-    this.change_state = (graphics) => {
+    this.changeState = (graphics) => {
       if (this.isAlive) {
         this.isAlive = false
         graphics.beginFill(deadFill)
@@ -33,14 +33,14 @@ class Cell {
       }
     }
 
-    this.set_alive = (graphics) => {
+    this.setAlive = (graphics) => {
       this.isAlive = true
       graphics.beginFill(aliveFill)
       graphics.drawRect(x + 0.5, y + 0.5, width - 1, height - 1)
       graphics.endFill()
     }
 
-    this.set_dead = () => {
+    this.setDead = () => {
       this.isAlive = false
     }
   }
@@ -89,7 +89,7 @@ wasm.then(conways => {
 
     let cell = cellArr[cellX][cellY]
 
-    cell.change_state(alivesGrid)
+    cell.changeState(alivesGrid)
   })
 
   let randomMap = () => {
@@ -106,7 +106,7 @@ wasm.then(conways => {
     return random
   }
 
-  map.set_alive(randomMap())
+  map.setAlive(randomMap())
 
   let defineMap = (prevAlives, alives) => {
     alivesGrid.clear()
@@ -115,7 +115,7 @@ wasm.then(conways => {
       let x = parseInt(prevAlives[i] / yMap)
       let y = parseInt(prevAlives[i] % yMap)
       if (x < xMap && y < yMap) {
-        cellArr[x][y].set_dead()
+        cellArr[x][y].setDead()
       }
     }
 
@@ -124,7 +124,7 @@ wasm.then(conways => {
       let y = parseInt(alives[i] % yMap)
 
       if (x < xMap && y < yMap) {
-        cellArr[x][y].set_alive(alivesGrid)
+        cellArr[x][y].setAlive(alivesGrid)
       }
     }
 

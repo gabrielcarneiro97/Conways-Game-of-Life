@@ -6,4 +6,4 @@ Conway's Game of Life in WebAssembly (Rust) + PIXI.js
 
 1. Clone the repo
 2. Run `npm i` & `npm run serve` at web-module directory
-3. Access `http://localhost:8080` on web. OBS: it's not working on Chrome.
+3. Access `http://localhost:8080` on web.

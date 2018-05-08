@@ -1,6 +1,10 @@
 import * as PIXI from 'pixi.js'
 const wasm = import('../rust-module/pkg/conways_game_of_life')
 
+function randomColor () {
+  return parseInt(((1 << 24) * Math.random() | 0).toString(16), 16)
+}
+
 const xMap = 40
 const yMap = 30
 const xTrue = xMap * 4
@@ -8,7 +12,7 @@ const yTrue = yMap * 4
 const cellSide = 20
 
 const deadFill = 0xF2F2F2
-const aliveFill = parseInt(((1 << 24) * Math.random() | 0).toString(16), 16)
+const aliveFill = randomColor()
 
 class Cell {
   constructor (x, y, width, height) {
@@ -47,7 +51,10 @@ class Cell {
 }
 
 wasm.then(conways => {
-  const app = new PIXI.Application()
+  const app = new PIXI.Application({
+    width: 800.5,
+    height: 600.5
+  })
   let map = conways.new_map(xMap, yMap)
   document.body.appendChild(app.view)
 

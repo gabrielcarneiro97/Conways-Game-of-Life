@@ -41,7 +41,10 @@ impl Cell {
             neighboors_alive: 0
         }
     }
+}
 
+#[wasm_bindgen]
+impl Cell {
     pub fn change_state(&mut self) {
         match self.state {
             State::Alive => self.state = State::Dead,
@@ -74,7 +77,10 @@ impl Map {
             generation: 0
         }
     }
+}
 
+#[wasm_bindgen]
+impl Map {
     pub fn get_alives(&self) -> Vec<i32> {
         self.alives.clone()
     }
@@ -134,7 +140,7 @@ impl Map {
 
     }
 
-        pub fn find_neighboors(&self, pos: i32) -> Vec<i32> {
+    pub fn find_neighboors(&self, pos: i32) -> Vec<i32> {
         
         let coord = self.get_coords(pos);
         let x = coord.x;
@@ -144,58 +150,58 @@ impl Map {
 
         if y == 0 {
             if x == 0 {
-                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y + 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
             } else if x == self.true_size.x - 1 {
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y + 1}));
             } else {
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
                 neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
             }
         } else if y == self.true_size.y - 1 {
             if x == 0 {
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
             } else if x == self.true_size.x - 1 {
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
             } else {
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
             }
         } else {
             if x == 0 {
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
                 neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
             } else if x == self.true_size.x - 1 {
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y + 1}));
             } else {
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x - 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x - 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x - 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y + 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y + 1}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y + 1}));
-                neighboors.push(self.get_pos(&Coords { x: x + 1, y: y}));
+                neighboors.push(self.get_pos(&Coords { x: x + 1, y}));
                 neighboors.push(self.get_pos(&Coords { x: x + 1, y: y - 1}));
-                neighboors.push(self.get_pos(&Coords { x: x, y: y - 1}));
+                neighboors.push(self.get_pos(&Coords { x, y: y - 1}));
             }
         }
 
@@ -343,7 +349,6 @@ impl Map {
         gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 35}));
         gosper_glider_gun.push(self.offset_pos(Coords {x: 3, y: 36}));
         gosper_glider_gun.push(self.offset_pos(Coords {x: 4, y: 36}));
-        
 
         gosper_glider_gun
     }

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 const wasm = import('../rust-module/pkg/conways_game_of_life');
+
 function randomColor() {
   return parseInt((16777216 * Math.random()).toString(16), 16);
 }
